@@ -69,7 +69,7 @@ FetchContent_MakeAvailable(googletest)
 
 # Creates a separate executable target specifically for running your unit tests.
 add_executable(cme_tests
-    software/tests/test_project_builds.cpp
+    software/tests/core/test_types.cpp
 )
 
 # Links the test runner to your core engine and the downloaded GoogleTest framework.
