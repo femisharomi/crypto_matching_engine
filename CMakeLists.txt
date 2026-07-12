@@ -20,6 +20,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Creates a library target named 'cme_core' to hold the main engine logic.
 add_library(cme_core
     software/src/cme_core.cpp
+    software/src/order/order.cpp
 )
 
 # Specifies where the header (.h/.hpp) files for 'cme_core' are located.
@@ -58,6 +59,7 @@ include(FetchContent)
 FetchContent_Declare(
     googletest
     URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 
 # Downloads, configures, and builds GoogleTest isolated inside the project.
@@ -70,6 +72,7 @@ FetchContent_MakeAvailable(googletest)
 # Creates a separate executable target specifically for running your unit tests.
 add_executable(cme_tests
     software/tests/core/test_types.cpp
+    software/tests/order/test_order.cpp
 )
 
 # Links the test runner to your core engine and the downloaded GoogleTest framework.
