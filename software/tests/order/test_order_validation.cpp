@@ -12,7 +12,7 @@
 // AcceptsValidOrder
 TEST(CMEOrderValidationTests, AcceptsValidOrder)
 {
-    CMEOrderValidator validateOrder;
+    CMEOrderValidator validator;
 
     CMEOrder order(
     CMEOrderId(1001),
@@ -22,7 +22,7 @@ TEST(CMEOrderValidationTests, AcceptsValidOrder)
     CMEQuantity(25)
     );
 
-    CMEOrderValidationResult result = validateOrder.validateOrder(order);
+    CMEOrderValidationResult result = validator.validateOrder(order);
 
     EXPECT_EQ(result, CMEOrderValidationResult::VALID);
 
@@ -35,7 +35,7 @@ TEST(CMEOrderValidationTests, AcceptsValidOrder)
 // RejectsZeroOrderId
 TEST(CMEOrderValidationTests, RejectsZeroOrderId)
 {
-    CMEOrderValidator validateOrder;
+    CMEOrderValidator validator;
 
     CMEOrder order(
     CMEOrderId(0),
@@ -45,7 +45,7 @@ TEST(CMEOrderValidationTests, RejectsZeroOrderId)
     CMEQuantity(25)
     );
 
-    CMEOrderValidationResult result = validateOrder.validateOrder(order);
+    CMEOrderValidationResult result = validator.validateOrder(order);
 
     EXPECT_EQ(result, CMEOrderValidationResult::INVALID_ORDER_ID);
 
@@ -58,7 +58,7 @@ TEST(CMEOrderValidationTests, RejectsZeroOrderId)
 // RejectsEmptySymbol
 TEST(CMEOrderValidationTests, RejectsEmptySymbol)
 {
-    CMEOrderValidator validateOrder;
+    CMEOrderValidator validator;
 
     CMEOrder order(
     CMEOrderId(1001),
@@ -68,7 +68,7 @@ TEST(CMEOrderValidationTests, RejectsEmptySymbol)
     CMEQuantity(25)
     );
 
-    CMEOrderValidationResult result = validateOrder.validateOrder(order);
+    CMEOrderValidationResult result = validator.validateOrder(order);
 
     EXPECT_EQ(result, CMEOrderValidationResult::EMPTY_SYMBOL);
 
@@ -81,7 +81,7 @@ TEST(CMEOrderValidationTests, RejectsEmptySymbol)
 // RejectsZeroPrice
 TEST(CMEOrderValidationTests, RejectsZeroPrice)
 {
-    CMEOrderValidator validateOrder;
+    CMEOrderValidator validator;
 
     CMEOrder order(
     CMEOrderId(1001),
@@ -91,7 +91,7 @@ TEST(CMEOrderValidationTests, RejectsZeroPrice)
     CMEQuantity(25)
     );
 
-    CMEOrderValidationResult result = validateOrder.validateOrder(order);
+    CMEOrderValidationResult result = validator.validateOrder(order);
 
     EXPECT_EQ(result, CMEOrderValidationResult::INVALID_PRICE);
 
@@ -100,7 +100,7 @@ TEST(CMEOrderValidationTests, RejectsZeroPrice)
 // RejectsNegativePrice
 TEST(CMEOrderValidationTests, RejectsNegativePrice)
 {
-    CMEOrderValidator validateOrder;
+    CMEOrderValidator validator;
 
     CMEOrder order(
     CMEOrderId(1001),
@@ -110,7 +110,7 @@ TEST(CMEOrderValidationTests, RejectsNegativePrice)
     CMEQuantity(25)
     );
 
-    CMEOrderValidationResult result = validateOrder.validateOrder(order);
+    CMEOrderValidationResult result = validator.validateOrder(order);
 
     EXPECT_EQ(result, CMEOrderValidationResult::INVALID_PRICE);
 
@@ -123,7 +123,7 @@ TEST(CMEOrderValidationTests, RejectsNegativePrice)
 // RejectsZeroQuantity
 TEST(CMEOrderValidationTests, RejectsZeroQuantity)
 {
-    CMEOrderValidator validateOrder;
+    CMEOrderValidator validator;
 
     CMEOrder order(
     CMEOrderId(1001),
@@ -133,7 +133,7 @@ TEST(CMEOrderValidationTests, RejectsZeroQuantity)
     CMEQuantity(0)
     );
 
-    CMEOrderValidationResult result = validateOrder.validateOrder(order);
+    CMEOrderValidationResult result = validator.validateOrder(order);
 
     EXPECT_EQ(result, CMEOrderValidationResult::INVALID_QUANTITY);
 
@@ -142,7 +142,7 @@ TEST(CMEOrderValidationTests, RejectsZeroQuantity)
 // RejectsNegativeQuantity
 TEST(CMEOrderValidationTests, RejectsNegativeQuantity)
 {
-    CMEOrderValidator validateOrder;
+    CMEOrderValidator validator;
 
     CMEOrder order(
     CMEOrderId(1001),
@@ -152,7 +152,7 @@ TEST(CMEOrderValidationTests, RejectsNegativeQuantity)
     CMEQuantity(-25)
     );
 
-    CMEOrderValidationResult result = validateOrder.validateOrder(order);
+    CMEOrderValidationResult result = validator.validateOrder(order);
 
     EXPECT_EQ(result, CMEOrderValidationResult::INVALID_QUANTITY);
 
@@ -165,7 +165,7 @@ TEST(CMEOrderValidationTests, RejectsNegativeQuantity)
 // ReturnsFirstValidationError
 TEST(CMEOrderValidationTests, ReturnsFirstValidationError)
 {
-    CMEOrderValidator validateOrder;
+    CMEOrderValidator validator;
 
     CMEOrder order(
     CMEOrderId(0),
@@ -175,7 +175,7 @@ TEST(CMEOrderValidationTests, ReturnsFirstValidationError)
     CMEQuantity(-25)
     );
 
-    CMEOrderValidationResult result = validateOrder.validateOrder(order);
+    CMEOrderValidationResult result = validator.validateOrder(order);
 
     EXPECT_EQ(result, CMEOrderValidationResult::INVALID_ORDER_ID);
 }

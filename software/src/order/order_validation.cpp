@@ -1,5 +1,4 @@
 #include "cme/order/order_validation.hpp"
-#include "cme/order/order.hpp"
 
 CMEOrderValidationResult CMEOrderValidator::validateOrder(const CMEOrder& order) const
 {
