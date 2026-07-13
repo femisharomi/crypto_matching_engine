@@ -14,7 +14,7 @@ TEST(CMEOrderTests, ConstructorStoresAllOrderInformation)
     CMEOrder order(
         CMEOrderId(1001),
         CMESymbol("BTC-GBP"),
-        CMESide::buy,
+        CMESide::BUY,
         CMEPrice(50000),
         CMEQuantity(25)
     );
@@ -22,7 +22,7 @@ TEST(CMEOrderTests, ConstructorStoresAllOrderInformation)
     // Assert
     EXPECT_EQ(order.getOrderId(), CMEOrderId(1001));
     EXPECT_EQ(order.getOrderSymbol(), CMESymbol("BTC-GBP"));
-    EXPECT_EQ(order.getOrderSide(), CMESide::buy);
+    EXPECT_EQ(order.getOrderSide(), CMESide::BUY);
     EXPECT_EQ(order.getOrderPrice(), CMEPrice(50000));
     EXPECT_EQ(order.getOrderOriginalQuantity(), CMEQuantity(25));
     EXPECT_EQ(order.getOrderRemainingQuantity(), CMEQuantity(25));
@@ -36,7 +36,7 @@ TEST(CMEOrderTests, NewOrderWithPositiveQuantityIsNotFilled)
     CMEOrder order(
         CMEOrderId(1001),
         CMESymbol("BTC-GBP"),
-        CMESide::buy,
+        CMESide::BUY,
         CMEPrice(50000),
         CMEQuantity(25)
     );
