@@ -7,8 +7,8 @@
 /* Represents which side of the market an order belongs to. */
 enum class CMESide
 {
-    buy,
-    sell
+    BUY,
+    SELL
 };
 
 /* Represents a price. */
