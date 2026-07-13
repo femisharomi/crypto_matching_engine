@@ -12,8 +12,8 @@
 /* Checks that the buy side is different from the sell side. */
 TEST(CMECoreTypesTests, BuyIsDifferentFromSell)
 {
-    CMESide buy_side = CMESide::buy;
-    CMESide sell_side = CMESide::sell;
+    CMESide buy_side = CMESide::BUY;
+    CMESide sell_side = CMESide::SELL;
 
     EXPECT_NE(buy_side, sell_side);
 }
