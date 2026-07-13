@@ -22,6 +22,7 @@ add_library(cme_core
     software/src/cme_core.cpp
     software/src/order/order.cpp
     software/src/order/order_validation.cpp
+    software/src/order_book/price_level.cpp
 )
 
 # Specifies where the header (.h/.hpp) files for 'cme_core' are located.
@@ -75,6 +76,7 @@ add_executable(cme_tests
     software/tests/core/test_types.cpp
     software/tests/order/test_order.cpp
     software/tests/order/test_order_validation.cpp
+    software/tests/order_book/test_price_level.cpp
 )
 
 # Links the test runner to your core engine and the downloaded GoogleTest framework.
