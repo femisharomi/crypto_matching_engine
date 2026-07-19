@@ -258,3 +258,38 @@ TEST(CMEOrderBookTests, AcceptsValidLimitOrderAfterRejectedOrder)
   
     EXPECT_EQ(orderBook.getBuyLevel(CMEPrice(50000)).getFrontOrder().getOrderId().value, 1002);
 }
+
+// ============================================================================
+// 8. BEST PRICE TESTS
+// ============================================================================
+TEST(CMEOrderBookTests, ThrowsWhenNoBestBidExists)
+{
+    CMESymbol btc_gbp("BTC-GBP");
+    CMEOrderBook orderBook(btc_gbp);
+
+    EXPECT_THROW(orderBook.getBestBid(), std::runtime_error);
+}
+
+TEST(CMEOrderBookTests, ThrowsWhenNoBestAskExists)
+{
+    CMESymbol btc_gbp("BTC-GBP");
+    CMEOrderBook orderBook(btc_gbp);
+
+    EXPECT_THROW(orderBook.getBestAsk(), std::runtime_error);
+}
+
+TEST(CMEOrderBookTests, ReturnsSingleBuyPriceAsBestBid)
+{
+    CMESymbol btc_gbp("BTC-GBP");
+    CMEOrderBook orderBook(btc_gbp);
+
+    CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(502), CMEQuantity(50));
+    orderBook.addLimitOrder(newOrder1);
+
+    EXPECT_EQ(orderBook.getBestBid(), CMEPrice(502));
+}
+
+TEST(CMEOrderBookTests, ReturnsHighestBuyPrice)
+{
+    
+}
