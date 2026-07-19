@@ -15,12 +15,11 @@ enum class CMEOrderValidationResult
 
 /* Checks whether an order satisfies the engine's basic validation rules. */
 class CMEOrderValidator {
-public:
-
+    public:
     /* Validates an order and returns the first validation failure found. */
     CMEOrderValidationResult validateOrder(const CMEOrder& order) const;
 
-private:
+    private:
     //TBA
 };
 #endif //CME_ORDER_ORDER_VALIDATION_HPP

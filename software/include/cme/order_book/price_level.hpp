@@ -7,7 +7,7 @@
 
 /* Stored orders that belong to one price in first-in, first-out order. */
 class CMEPriceLevel{
-public:
+    public:
     /* Creates a price level for one specific price. */
     CMEPriceLevel(CMEPrice price);
 
@@ -29,9 +29,10 @@ public:
     /* Removes the order that has waited at this price level for the longest time. */
     bool removeFrontOrder();
 
-private:
-    CMEPrice levelPrice; // The single price represented by this price level.
-
-    std::deque<CMEOrder> orders; // The orders stored in FIFO order.
+    private:
+    // The single price represented by this price level.
+    CMEPrice levelPrice; 
+    // The orders stored in FIFO order.
+    std::deque<CMEOrder> orders; 
 };
 #endif // CME_ORDER_BOOK_PRICE_LEVEL_HPP

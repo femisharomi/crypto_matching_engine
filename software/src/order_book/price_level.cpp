@@ -1,6 +1,6 @@
 #include "cme/order_book/price_level.hpp"
 
-CMEPriceLevel::CMEPriceLevel(CMEPrice price): levelPrice(price)
+CMEPriceLevel::CMEPriceLevel(CMEPrice price) : levelPrice(price)
 {
 }
 
