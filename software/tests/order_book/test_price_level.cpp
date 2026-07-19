@@ -53,8 +53,8 @@ TEST(CMEPriceLevelTests, KeepsOrdersInFirstInFirstOutOrder)
     CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(50));
     CMEOrder newOrder2(CMEOrderId(1002), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(50));
 
-    bool orderAdded1 = levelPrice.addOrder(newOrder1);
-    bool orderAdded2 = levelPrice.addOrder(newOrder2);
+    levelPrice.addOrder(newOrder1);
+    levelPrice.addOrder(newOrder2);
 
     EXPECT_EQ(levelPrice.getOrderCount(), 2);
 
