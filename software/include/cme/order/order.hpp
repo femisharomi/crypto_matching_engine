@@ -4,7 +4,7 @@
 #include "cme/core/types.hpp"
 
 class CMEOrder {
-public:    
+    public:    
     // Constructor 
     CMEOrder(
         CMEOrderId order_id,
@@ -30,7 +30,7 @@ public:
 
     bool isOrderFilled() const;
 
-private:
+    private:
     CMEOrderId orderId;
     CMESymbol orderSymbol;
     CMESide orderSide;
