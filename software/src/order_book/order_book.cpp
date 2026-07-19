@@ -9,28 +9,33 @@ CMESymbol CMEOrderBook::getSymbol() const
     return bookSymbol;
 }
 
-bool CMEOrderBook::addOrder(const CMEOrder &order)
+bool CMEOrderBook::addLimitOrder(const CMEOrder &order)
 {
-    if(order.getOrderSymbol() != bookSymbol) return false;
-
-    CMEPrice priceObj = order.getOrderPrice();
-
-    switch(order.getOrderSide())
+    // Check to ensure the order is valid before processing it into the Limit Order book.
+    CMEOrderValidationResult isValid = orderValidator.validateOrder(order);
+    if(isValid == CMEOrderValidationResult::VALID)
     {
-        case CMESide::BUY:
-            // Inserts a new CMEPriceLevel(priceObj) ONLY if the key priceObj.value doesn't exist yet
-            buyLevels.try_emplace(priceObj.value, priceObj);
-            return buyLevels.at(priceObj.value).addOrder(order);
-            
-        case CMESide::SELL:
-            // Inserts a new CMEPriceLevel(priceObj) ONLY if the key priceObj.value doesn't exist yet
-            sellLevels.try_emplace(priceObj.value, priceObj);
-            return sellLevels.at(priceObj.value).addOrder(order);
-            
-        default: 
-            throw std::runtime_error("Unknown market side encountered!");
-    }
+        if(order.getOrderSymbol() == bookSymbol)
+        {
+            CMEPrice priceObj = order.getOrderPrice();
 
+            switch(order.getOrderSide())
+            {
+                case CMESide::BUY:
+                    // Inserts a new CMEPriceLevel(priceObj) ONLY if the key priceObj.value doesn't exist yet
+                    buyLevels.try_emplace(priceObj.value, priceObj);
+                    return buyLevels.at(priceObj.value).addOrder(order);
+                    
+                case CMESide::SELL:
+                    // Inserts a new CMEPriceLevel(priceObj) ONLY if the key priceObj.value doesn't exist yet
+                    sellLevels.try_emplace(priceObj.value, priceObj);
+                    return sellLevels.at(priceObj.value).addOrder(order);
+                    
+                default: 
+                    throw std::runtime_error("Unknown market side encountered!");
+            }
+        }
+    }
     return false; 
 }
 
