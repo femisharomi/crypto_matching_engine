@@ -15,7 +15,7 @@ public:
     CMEPrice getPrice() const;
 
     /* Adds an order when its price matches this price level. */
-    bool addOrder(CMEOrder &order);
+    bool addOrder(const CMEOrder &order);
 
     /* Returns the number of orders currently stored at this price level. */
     std::size_t getOrderCount() const;

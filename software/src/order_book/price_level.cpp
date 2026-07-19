@@ -9,7 +9,7 @@ CMEPrice CMEPriceLevel::getPrice() const
     return levelPrice;
 }
 
-bool CMEPriceLevel::addOrder(CMEOrder &order)
+bool CMEPriceLevel::addOrder(const CMEOrder &order)
 {
     if(order.getOrderPrice().value != levelPrice.value) return false;
 
