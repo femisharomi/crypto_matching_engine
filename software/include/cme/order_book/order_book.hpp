@@ -47,7 +47,7 @@ class CMEOrderBook
     std::map<std::int64_t, CMEPriceLevel> buyLevels; 
 
     // The sell price levels indexed by their numeric price.
-    std::map<int64_t, CMEPriceLevel> sellLevels;
+    std::map<std::int64_t, CMEPriceLevel> sellLevels;
 
     // The validator used to check orders before they enter the order book.
     CMEOrderValidator orderValidator;
