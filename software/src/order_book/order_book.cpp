@@ -32,7 +32,7 @@ bool CMEOrderBook::addLimitOrder(const CMEOrder &order)
                     return sellLevels.at(priceObj.value).addOrder(order);
                     
                 default: 
-                    throw std::runtime_error("Unknown market side encountered!");
+                    throw std::runtime_error("Function: CMEOrderBook::addLimitOrder() - Unknown market side encountered!");
             }
         }
     }
@@ -57,4 +57,38 @@ const CMEPriceLevel& CMEOrderBook::getBuyLevel(CMEPrice price) const
 const CMEPriceLevel& CMEOrderBook::getSellLevel(CMEPrice price) const
 {
     return sellLevels.at(price.value);
+}
+
+bool CMEOrderBook::hasBuyLevels() const
+{
+    return !buyLevels.empty();
+}
+
+bool CMEOrderBook::hasSellLevels() const
+{
+    return !sellLevels.empty();
+}
+
+CMEPrice CMEOrderBook::getBestBid() const
+{
+    // 1. Check whether any buy levels exist and throw if empty
+    if(buyLevels.empty()) throw std::runtime_error("Function: CMEOrderBook::getBestBid() - No Buy levels exist!");
+    
+    // 2. Extract the final element using rbegin()
+    std::map<std::int64_t,CMEPriceLevel>::const_reverse_iterator bestBid = buyLevels.rbegin();
+    
+    // 3. Return CMEPrice object 
+    return bestBid->second.getPrice();
+}
+
+CMEPrice CMEOrderBook::getBestAsk() const
+{
+    // 1. Check whether any sell levels exist and throw if empty
+    if(sellLevels.empty()) throw std::runtime_error("Function: CMEOrderBook::getBestAsk() - No Sell levels exist!");
+    
+    // 2. Extract the final element 
+    std::map<std::int64_t,CMEPriceLevel>::const_iterator bestAsk = sellLevels.begin();
+    
+    // 3. Return CMEPrice object 
+    return bestAsk->second.getPrice();
 }

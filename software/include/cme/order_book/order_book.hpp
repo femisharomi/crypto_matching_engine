@@ -33,6 +33,12 @@ class CMEOrderBook
     /* Returns the sell price level stored at a specific price. */
     const CMEPriceLevel& getSellLevel(CMEPrice price) const;
 
+    /* Returns the highest buy price currently stored. */
+    CMEPrice getBestBid() const;
+
+    /* Returns the lowest sell price currently stored */
+    CMEPrice getBestAsk() const;
+
     private:
     // The trading symbol represented by this order book.
     CMESymbol bookSymbol; 
@@ -41,9 +47,15 @@ class CMEOrderBook
     std::map<std::int64_t, CMEPriceLevel> buyLevels; 
 
     // The sell price levels indexed by their numeric price.
-    std::map<int64_t, CMEPriceLevel> sellLevels;
+    std::map<std::int64_t, CMEPriceLevel> sellLevels;
 
     // The validator used to check orders before they enter the order book.
     CMEOrderValidator orderValidator;
+
+    /* Returns whether any buy price levels exist. */
+    bool hasBuyLevels() const;
+
+    /* Returns whether any sell price levels exist. */
+    bool hasSellLevels() const;
 };
 #endif // CME_ORDER_BOOK_ORDER_BOOK_HPP
