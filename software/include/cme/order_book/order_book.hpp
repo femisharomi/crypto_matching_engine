@@ -11,9 +11,9 @@
 /* Stores the buy and sell price levels for one trading symbol. */
 class CMEOrderBook
 {
-    public:
+public:
     /* Creates an empty order book for one trading symbol. */
-    CMEOrderBook(CMESymbol symbol);
+    explicit CMEOrderBook(CMESymbol symbol);
 
     /* Returns the trading symbol represented by this order book. */
     CMESymbol getSymbol() const;
@@ -36,10 +36,10 @@ class CMEOrderBook
     /* Returns the highest buy price currently stored. */
     CMEPrice getBestBid() const;
 
-    /* Returns the lowest sell price currently stored */
+    /* Returns the lowest sell price currently stored. */
     CMEPrice getBestAsk() const;
 
-    private:
+private:
     // The trading symbol represented by this order book.
     CMESymbol bookSymbol; 
 
@@ -57,5 +57,17 @@ class CMEOrderBook
 
     /* Returns whether any sell price levels exist. */
     bool hasSellLevels() const;
+
+    /* Returns whether an incoming order crosses the best opposite price. */
+    bool canMatch(const CMEOrder &incomingOrder) const;
+
+    /* Returns whether the incoming and resting orders have equal remaining quantities. */
+    bool hasMatchingQuantity(const CMEOrder &incomingOrder, const CMEOrder &restingOrder) const;
+
+    /* Attempts to fully match an incoming order against the best opposite order. */
+    bool tryMatchOrder(const CMEOrder &incomingOrder);
+
+    /* Removes an empty price level from the selected side of the order book. */
+    void removeEmptyLevel(CMESide side, CMEPrice price);
 };
 #endif // CME_ORDER_BOOK_ORDER_BOOK_HPP
