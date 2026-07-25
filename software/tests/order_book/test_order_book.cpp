@@ -6,7 +6,7 @@
 // ============================================================================
 
 // ============================================================================
-// 1. ORDER BOOK CREATION TESTS
+// ORDER BOOK CREATION TESTS
 // ============================================================================
 TEST(CMEOrderBookTests, NewOrderBookStoresItsSymbolAndStartsEmpty)
 {
@@ -18,7 +18,7 @@ TEST(CMEOrderBookTests, NewOrderBookStoresItsSymbolAndStartsEmpty)
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
 }
 // ============================================================================
-// 2. BUY ORDER TESTS
+// BUY ORDER TESTS
 // ============================================================================
 TEST(CMEOrderBookTests, AddsBuyOrderToBuySide)
 {
@@ -70,7 +70,7 @@ TEST(CMEOrderBookTests, CreatesSeparateBuyLevelsForDifferentPrices)
     EXPECT_EQ(orderBook.getBuyLevel(CMEPrice(49000)).getOrderCount(), 1);
 }
 // ============================================================================
-// 3. SELL ORDER TESTS
+// SELL ORDER TESTS
 // ============================================================================
 TEST(CMEOrderBookTests, AddsSellOrderToSellSide)
 {
@@ -106,27 +106,7 @@ TEST(CMEOrderBookTests, CreatesSeparateSellLevelsForDifferentPrices)
 }
 
 // ============================================================================
-// 4. ORDER BOOK SIDE SEPARATION TESTS
-// ============================================================================
-TEST(CMEOrderBookTests, StoresSamePriceSeparatelyOnBuyAndSellSides)
-{
-    CMESymbol btc_gbp("BTC-GBP");
-    CMEOrderBook orderBook(btc_gbp);
-
-    CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(50));
-    CMEOrder newOrder2(CMEOrderId(1002), CMESymbol("BTC-GBP"), CMESide::SELL, CMEPrice(50000), CMEQuantity(50));
-
-    EXPECT_TRUE(orderBook.addLimitOrder(newOrder1));
-    EXPECT_TRUE(orderBook.addLimitOrder(newOrder2));
-
-    EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
-    EXPECT_EQ(orderBook.getSellLevelCount(), 1);
-
-    EXPECT_EQ(orderBook.getBuyLevel(CMEPrice(50000)).getFrontOrder().getOrderId().value, 1001);
-    EXPECT_EQ(orderBook.getSellLevel(CMEPrice(50000)).getFrontOrder().getOrderId().value, 1002);
-}
-// ============================================================================
-// 5. SYMBOL REJECTION TESTS
+// SYMBOL REJECTION TESTS
 // ============================================================================
 TEST(CMEOrderBookTests, RejectsOrderForDifferentSymbol)
 {
@@ -142,7 +122,7 @@ TEST(CMEOrderBookTests, RejectsOrderForDifferentSymbol)
 }
 
 // ============================================================================
-// 6. LIMIT ORDER VALIDATION TESTS
+// LIMIT ORDER VALIDATION TESTS
 // ============================================================================
 TEST(CMEOrderBookTests, RejectsLimitOrderWithZeroOrderId)
 {
@@ -223,7 +203,7 @@ TEST(CMEOrderBookTests, RejectsLimitOrderWithNegativeQuantity)
 }
 
 // ============================================================================
-// 7. REJECTED ORDER STATE TESTS
+// REJECTED ORDER STATE TESTS
 // ============================================================================
 TEST(CMEOrderBookTests, RejectedLimitOrderDoesNotModifyExistingLevels)
 {
@@ -260,7 +240,7 @@ TEST(CMEOrderBookTests, AcceptsValidLimitOrderAfterRejectedOrder)
 }
 
 // ============================================================================
-// 8. BEST PRICE TESTS
+// BEST PRICE TESTS
 // ============================================================================
 TEST(CMEOrderBookTests, ThrowsWhenNoBestBidExists)
 {
@@ -351,4 +331,111 @@ TEST(CMEOrderBookTests, ReturnsCorrectBestBidAndBestAsk)
 
     EXPECT_EQ(orderBook.getBestAsk(), CMEPrice(50900));
     EXPECT_EQ(orderBook.getBestBid(), CMEPrice(50000));
+}
+
+// ============================================================================
+// BASIC LIMIT MATCHING TESTS
+// ============================================================================
+TEST(CMEOrderBookTests, MatchesBuyOrderWithBestAsk)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder sellOrder(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::SELL,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(sellOrder));
+
+    CMEOrder buyOrder(
+        CMEOrderId(1002),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(buyOrder));
+
+    EXPECT_EQ(orderBook.getSellLevelCount(), 0);
+    EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
+}
+
+TEST(CMEOrderBookTests, MatchesBuyOrderPricedAboveBestAsk)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder sellOrder(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::SELL,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    orderBook.addLimitOrder(sellOrder);
+
+    CMEOrder buyOrder(
+        CMEOrderId(1002),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(51000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(buyOrder));
+
+    EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
+    EXPECT_EQ(orderBook.getSellLevelCount(), 0);
+}
+
+TEST(CMEOrderBookTests, MatchesSellOrderWithBestBid)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder buyOrder(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    orderBook.addLimitOrder(buyOrder);
+
+    CMEOrder sellOrder(
+        CMEOrderId(1002),
+        CMESymbol("BTC-GBP"),
+        CMESide::SELL,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(sellOrder));
+
+    EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
+    EXPECT_EQ(orderBook.getSellLevelCount(), 0);
+}
+
+TEST(CMEOrderBookTests, MatchesSellOrderPricedBelowBestBid)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder buyOrder(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    orderBook.addLimitOrder(buyOrder);
+
+    CMEOrder sellOrder(
+        CMEOrderId(1002),
+        CMESymbol("BTC-GBP"),
+        CMESide::SELL,
+        CMEPrice(49000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(sellOrder));
+
+    EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
+    EXPECT_EQ(orderBook.getSellLevelCount(), 0);
 }
