@@ -143,8 +143,8 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
 
             if (incomingRemaining == restingRemaining)
             {
-                sellLevel.removeFrontOrder();
                 createTrade(incomingOrder, restingOrder, restingRemaining);
+                sellLevel.removeFrontOrder();
                 removeEmptyLevel(CMESide::SELL, bestAsk);
                 return true;
             }
@@ -166,8 +166,8 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
                     "Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to incoming order!");
             }
 
-            sellLevel.removeFrontOrder();
             createTrade(incomingOrder, restingOrder, restingRemaining);
+            sellLevel.removeFrontOrder();
             removeEmptyLevel(CMESide::SELL, bestAsk);
             return false;
         }
@@ -183,8 +183,8 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
 
             if (incomingRemaining == restingRemaining)
             {
-                buyLevel.removeFrontOrder();
                 createTrade(incomingOrder, restingOrder, restingRemaining);
+                buyLevel.removeFrontOrder();
                 removeEmptyLevel(CMESide::BUY, bestBid);
                 return true;
             }
@@ -206,8 +206,8 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
                     "Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to incoming order!");
             }
 
-            buyLevel.removeFrontOrder();
             createTrade(incomingOrder, restingOrder, restingRemaining);
+            buyLevel.removeFrontOrder();
             removeEmptyLevel(CMESide::BUY, bestBid);
             return false;
         }
@@ -283,4 +283,38 @@ void CMEOrderBook::createTrade(const CMEOrder& incomingOrder, const CMEOrder& re
     }
 
     nextTradeId++;
+}
+
+bool CMEOrderBook::cancelOrder(CMEOrderId orderId)
+{
+    // 1. Search and remove from buy side
+    for (std::map<std::int64_t, CMEPriceLevel>::iterator it = buyLevels.begin(); it != buyLevels.end(); ) 
+    {
+        if (it->second.removeOrder(orderId)) 
+        {
+            if (it->second.isEmpty()) 
+            {
+                it = buyLevels.erase(it);
+            }
+            return true;
+        }
+        ++it;
+    }
+
+    // 2. Search and remove from sell side
+    for (std::map<std::int64_t, CMEPriceLevel>::iterator it = sellLevels.begin(); it != sellLevels.end(); ) 
+    {
+        if (it->second.removeOrder(orderId)) 
+        {
+            if (it->second.isEmpty()) 
+            {
+                it = sellLevels.erase(it);
+            }
+            return true;
+        }
+        ++it;
+    }
+
+    // 3. Order not found in any level
+    return false;
 }

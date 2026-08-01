@@ -32,9 +32,13 @@ class CMEPriceLevel{
     /* Removes the order that has waited at this price level for the longest time. */
     bool removeFrontOrder();
 
+    /* Removes the order with the supplied order identifier. */
+    bool removeOrder(CMEOrderId orderId);
+
     private:
     // The single price represented by this price level.
     CMEPrice levelPrice; 
+    
     // The orders stored in FIFO order.
     std::deque<CMEOrder> orders; 
 };
