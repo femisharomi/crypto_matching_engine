@@ -3,6 +3,7 @@
 
 CMEOrderBook::CMEOrderBook(CMESymbol symbol) : bookSymbol(symbol)
 {
+    nextTradeId = 1;
 }
 
 CMESymbol CMEOrderBook::getSymbol() const
@@ -143,6 +144,7 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
             if (incomingRemaining == restingRemaining)
             {
                 sellLevel.removeFrontOrder();
+                createTrade(incomingOrder, restingOrder, restingRemaining);
                 removeEmptyLevel(CMESide::SELL, bestAsk);
                 return true;
             }
@@ -154,7 +156,7 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
                     throw std::runtime_error(
                         "Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to resting order!");
                 }
-
+                createTrade(incomingOrder, restingOrder, incomingRemaining);
                 return true;
             }
 
@@ -165,6 +167,7 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
             }
 
             sellLevel.removeFrontOrder();
+            createTrade(incomingOrder, restingOrder, restingRemaining);
             removeEmptyLevel(CMESide::SELL, bestAsk);
             return false;
         }
@@ -181,6 +184,7 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
             if (incomingRemaining == restingRemaining)
             {
                 buyLevel.removeFrontOrder();
+                createTrade(incomingOrder, restingOrder, restingRemaining);
                 removeEmptyLevel(CMESide::BUY, bestBid);
                 return true;
             }
@@ -192,7 +196,7 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
                     throw std::runtime_error(
                         "Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to resting order!");
                 }
-
+                createTrade(incomingOrder, restingOrder, incomingRemaining);
                 return true;
             }
 
@@ -203,6 +207,7 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
             }
 
             buyLevel.removeFrontOrder();
+            createTrade(incomingOrder, restingOrder, restingRemaining);
             removeEmptyLevel(CMESide::BUY, bestBid);
             return false;
         }
@@ -247,4 +252,35 @@ void CMEOrderBook::removeEmptyLevel(CMESide side, CMEPrice levelPrice)
             throw std::runtime_error(
                 "Function: CMEOrderBook::removeEmptyLevel() - Unknown market side encountered!");
     }
+}
+
+const std::optional<CMETrade>& CMEOrderBook::getLastTrade() const
+{
+    return lastTrade;
+}
+
+void CMEOrderBook::createTrade(const CMEOrder& incomingOrder, const CMEOrder& restingOrder, CMEQuantity tradeQuantity)
+{
+    if(incomingOrder.getOrderSide() == CMESide::BUY)
+    {
+        // The Incoming order is BUY
+        lastTrade = CMETrade(nextTradeId, 
+                            incomingOrder.getOrderId(), 
+                            restingOrder.getOrderId(), 
+                            restingOrder.getOrderSymbol(), 
+                            restingOrder.getOrderPrice(), 
+                            tradeQuantity);
+    }
+    else
+    {
+        // The Incoming order is SELL
+        lastTrade = CMETrade(nextTradeId, 
+                            restingOrder.getOrderId(), 
+                            incomingOrder.getOrderId(), 
+                            restingOrder.getOrderSymbol(), 
+                            restingOrder.getOrderPrice(), 
+                            tradeQuantity);
+    }
+
+    nextTradeId++;
 }

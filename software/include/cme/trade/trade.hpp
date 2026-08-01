@@ -39,17 +39,23 @@ public:
     CMEQuantity getTradeQuantity() const;
 
 private:
-    CMETradeId tradeId; // The unique identifier assigned to this trade.
+    // The unique identifier assigned to this trade.
+    CMETradeId tradeId;
 
-    CMEOrderId buyOrderId; // The identifier of the buy order involved in this trade.
+    // The identifier of the buy order involved in this trade.
+    CMEOrderId buyOrderId; 
 
-    CMEOrderId sellOrderId; // The identifier of the sell order involved in this trade.
+    // The identifier of the sell order involved in this trade.
+    CMEOrderId sellOrderId; 
 
-    CMESymbol tradeSymbol; // The trading symbol associated with this trade. 
+    // The trading symbol associated with this trade. 
+    CMESymbol tradeSymbol; 
 
-    CMEPrice tradePrice; // The price at which this trade executed
+    // The price at which this trade executed
+    CMEPrice tradePrice; 
 
-    CMEQuantity tradeQuantity; // The quantity executed by this trade. 
+    // The quantity executed by this trade. 
+    CMEQuantity tradeQuantity; 
 };
 
 #endif // CME_TRADE_TRADE_HPP

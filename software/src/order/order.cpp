@@ -40,11 +40,13 @@ CMEQuantity CMEOrder::getOrderRemainingQuantity() const
     return remainingQuantity;
 }
 
+/* Returns if the order has been filled. */
 bool CMEOrder::isOrderFilled() const
 {
     return remainingQuantity.value == 0;
 }
 
+/* Reduces the remaining quantity when a valid fill quantity is supplied. */
 bool CMEOrder::applyFill(CMEQuantity fillQuantity)
 {
     if(fillQuantity.value <= 0 || fillQuantity.value > remainingQuantity.value) return false;
