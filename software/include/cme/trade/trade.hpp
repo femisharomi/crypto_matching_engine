@@ -23,10 +23,10 @@ public:
     /* Returns the unique identifier assigned to this trade. */
     CMETradeId getTradeId() const;
 
-    /* Returns the identifier of the buy order invovled in this trade. */
+    /* Returns the identifier of the buy order involved in this trade. */
     CMEOrderId getBuyOrderId() const;
 
-    /* Returns the identifier of the sell order invovled in this trade. */
+    /* Returns the identifier of the sell order involved in this trade. */
     CMEOrderId getSellOrderId() const;
 
     /* Returns the trading symbol associated with this trade. */
