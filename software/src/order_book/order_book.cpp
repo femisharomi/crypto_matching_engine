@@ -10,7 +10,7 @@ CMESymbol CMEOrderBook::getSymbol() const
     return bookSymbol;
 }
 
-bool CMEOrderBook::addLimitOrder(const CMEOrder& incomingOrder)
+bool CMEOrderBook::addLimitOrder(CMEOrder incomingOrder)
 {
     CMEOrderValidationResult validationResult =
         orderValidator.validateOrder(incomingOrder);
@@ -121,13 +121,9 @@ bool CMEOrderBook::canMatch(const CMEOrder &incomingOrder) const
     }
 }
 
-bool CMEOrderBook::hasMatchingQuantity(const CMEOrder &incomingOrder, const CMEOrder &restingOrder) const
+bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
 {
-    return incomingOrder.getOrderRemainingQuantity() == restingOrder.getOrderRemainingQuantity();
-}
-
-bool CMEOrderBook::tryMatchOrder(const CMEOrder& incomingOrder)
-{
+    // Return immediately if prices do not cross.
     if (!canMatch(incomingOrder))
     {
         return false;
@@ -138,41 +134,77 @@ bool CMEOrderBook::tryMatchOrder(const CMEOrder& incomingOrder)
         case CMESide::BUY:
         {
             CMEPrice bestAsk = getBestAsk();
-
             CMEPriceLevel& sellLevel = sellLevels.at(bestAsk.value);
+            CMEOrder& restingOrder = sellLevel.getFrontOrder();
 
-            const CMEOrder& restingOrder = sellLevel.getFrontOrder();
+            CMEQuantity incomingRemaining = incomingOrder.getOrderRemainingQuantity();
+            CMEQuantity restingRemaining = restingOrder.getOrderRemainingQuantity();
 
-            if (!hasMatchingQuantity(incomingOrder, restingOrder))
+            if (incomingRemaining == restingRemaining)
             {
-                return false;
+                sellLevel.removeFrontOrder();
+                removeEmptyLevel(CMESide::SELL, bestAsk);
+                return true;
+            }
+
+            if (incomingRemaining < restingRemaining)
+            {
+                if (!restingOrder.applyFill(incomingRemaining))
+                {
+                    throw std::runtime_error(
+                        "Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to resting order!");
+                }
+
+                return true;
+            }
+
+            if (!incomingOrder.applyFill(restingRemaining))
+            {
+                throw std::runtime_error(
+                    "Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to incoming order!");
             }
 
             sellLevel.removeFrontOrder();
-
             removeEmptyLevel(CMESide::SELL, bestAsk);
-
-            return true;
+            return false;
         }
 
         case CMESide::SELL:
         {
             CMEPrice bestBid = getBestBid();
-
             CMEPriceLevel& buyLevel = buyLevels.at(bestBid.value);
+            CMEOrder& restingOrder = buyLevel.getFrontOrder();
 
-            const CMEOrder& restingOrder = buyLevel.getFrontOrder();
+            CMEQuantity incomingRemaining = incomingOrder.getOrderRemainingQuantity();
+            CMEQuantity restingRemaining = restingOrder.getOrderRemainingQuantity();
 
-            if (!hasMatchingQuantity(incomingOrder, restingOrder))
+            if (incomingRemaining == restingRemaining)
             {
-                return false;
+                buyLevel.removeFrontOrder();
+                removeEmptyLevel(CMESide::BUY, bestBid);
+                return true;
+            }
+
+            if (incomingRemaining < restingRemaining)
+            {
+                if (!restingOrder.applyFill(incomingRemaining))
+                {
+                    throw std::runtime_error(
+                        "Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to resting order!");
+                }
+
+                return true;
+            }
+
+            if (!incomingOrder.applyFill(restingRemaining))
+            {
+                throw std::runtime_error(
+                    "Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to incoming order!");
             }
 
             buyLevel.removeFrontOrder();
-
             removeEmptyLevel(CMESide::BUY, bestBid);
-
-            return true;
+            return false;
         }
 
         default:

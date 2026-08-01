@@ -44,3 +44,12 @@ bool CMEOrder::isOrderFilled() const
 {
     return remainingQuantity.value == 0;
 }
+
+bool CMEOrder::applyFill(CMEQuantity fillQuantity)
+{
+    if(fillQuantity.value <= 0 || fillQuantity.value > remainingQuantity.value) return false;
+
+    remainingQuantity.value -= fillQuantity.value;
+
+    return true;
+}
