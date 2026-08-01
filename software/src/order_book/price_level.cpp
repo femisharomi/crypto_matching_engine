@@ -37,11 +37,30 @@ CMEOrder& CMEPriceLevel::getFrontOrder()
     return orders.front();
 }
 
-/* Removes the order that has waited at this price level for the longest time. */
 bool CMEPriceLevel::removeFrontOrder()
 {
     if(orders.empty()) return false;
     
     orders.pop_front();
     return true;
+}
+
+bool CMEPriceLevel::removeOrder(CMEOrderId orderId)
+{
+    // Start with an explicit iterator
+    for (std::deque<CMEOrder>::iterator it = orders.begin(); it != orders.end();)
+    {
+        if (it->getOrderId() == orderId)
+        {
+            it = orders.erase(it); 
+            return true; // Return immediately if order IDs are unique
+        }
+        else
+        {
+            // Only advance the iterator if we DID NOT erase an element
+            ++it;
+        }
+    }
+    
+    return false; // Return false if the orderId was not found
 }

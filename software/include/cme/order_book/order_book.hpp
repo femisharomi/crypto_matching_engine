@@ -47,6 +47,9 @@ public:
     /* Creates a trade describing one completed match. */
     void createTrade(const CMEOrder& incomingOrder, const CMEOrder& restingOrder, CMEQuantity tradeQuantity);
 
+    /* Removes an order from the order book using its order identifier. */
+    bool cancelOrder(CMEOrderId orderId);
+
 private:
     // The trading symbol represented by this order book.
     CMESymbol bookSymbol; 

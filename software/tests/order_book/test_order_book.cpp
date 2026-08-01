@@ -767,3 +767,165 @@ TEST(CMEOrderBookTests, TradeIdentifiersIncreaseSequentially)
     ASSERT_TRUE(orderBook.getLastTrade().has_value());
     EXPECT_EQ(orderBook.getLastTrade()->getTradeId().value, 2);
 }
+
+// ============================================================================
+// ORDER CANCELLATION TESTS
+// ============================================================================
+
+TEST(CMEOrderBookTests, CancelsBuyOrder)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder buyOrder(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(buyOrder));
+
+    EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
+
+    EXPECT_TRUE(orderBook.cancelOrder(CMEOrderId(1001)));
+
+    EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
+    EXPECT_EQ(orderBook.getSellLevelCount(), 0);
+}
+
+TEST(CMEOrderBookTests, CancelsSellOrder)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder sellOrder(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::SELL,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(sellOrder));
+
+    EXPECT_EQ(orderBook.getSellLevelCount(), 1);
+
+    EXPECT_TRUE(orderBook.cancelOrder(CMEOrderId(1001)));
+
+    EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
+    EXPECT_EQ(orderBook.getSellLevelCount(), 0);
+}
+
+TEST(CMEOrderBookTests, CancellingUnknownOrderReturnsFalse)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder buyOrder(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(buyOrder));
+
+    EXPECT_FALSE(orderBook.cancelOrder(CMEOrderId(9999)));
+
+    EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
+    EXPECT_EQ(orderBook.getSellLevelCount(), 0);
+
+    EXPECT_EQ(
+        orderBook.getBuyLevel(CMEPrice(50000)).getOrderCount(),
+        1);
+}
+
+TEST(CMEOrderBookTests, CancellingOneOrderLeavesOtherOrdersAtSamePrice)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder firstOrder(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    CMEOrder secondOrder(
+        CMEOrderId(1002),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(50));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(firstOrder));
+    EXPECT_TRUE(orderBook.addLimitOrder(secondOrder));
+
+    EXPECT_TRUE(orderBook.cancelOrder(CMEOrderId(1001)));
+
+    EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
+
+    const CMEPriceLevel& level =
+        orderBook.getBuyLevel(CMEPrice(50000));
+
+    EXPECT_EQ(level.getOrderCount(), 1);
+    EXPECT_EQ(level.getFrontOrder().getOrderId().value, 1002);
+    EXPECT_EQ(level.getFrontOrder().getOrderRemainingQuantity().value, 50);
+}
+
+TEST(CMEOrderBookTests, CancellingLastOrderRemovesPriceLevel)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder sellOrder(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::SELL,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(sellOrder));
+
+    EXPECT_EQ(orderBook.getSellLevelCount(), 1);
+
+    EXPECT_TRUE(orderBook.cancelOrder(CMEOrderId(1001)));
+
+    EXPECT_EQ(orderBook.getSellLevelCount(), 0);
+}
+
+TEST(CMEOrderBookTests, CancellingOrderAtOnePriceDoesNotRemoveOtherPriceLevels)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder firstOrder(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    CMEOrder secondOrder(
+        CMEOrderId(1002),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(49000),
+        CMEQuantity(50));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(firstOrder));
+    EXPECT_TRUE(orderBook.addLimitOrder(secondOrder));
+
+    EXPECT_TRUE(orderBook.cancelOrder(CMEOrderId(1001)));
+
+    EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
+
+    EXPECT_EQ(
+        orderBook.getBestBid(),
+        CMEPrice(49000));
+
+    EXPECT_EQ(
+        orderBook.getBuyLevel(CMEPrice(49000)).getOrderCount(),
+        1);
+
+    EXPECT_EQ(
+        orderBook.getBuyLevel(CMEPrice(49000))
+            .getFrontOrder()
+            .getOrderId().value,
+        1002);
+}
