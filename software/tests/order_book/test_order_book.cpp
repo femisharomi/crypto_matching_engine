@@ -621,3 +621,149 @@ TEST(CMEOrderBookTests, PartiallyFilledRestingOrderKeepsFifoPosition)
         CMEQuantity(60)
     );
 }
+
+// ============================================================================
+// TRADE GENERATION TESTS
+// ============================================================================
+
+TEST(CMEOrderBookTests, EqualQuantityMatchCreatesTrade)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder restingSell(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::SELL,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    CMEOrder incomingBuy(
+        CMEOrderId(1002),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(restingSell));
+    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuy));
+
+    ASSERT_TRUE(orderBook.getLastTrade().has_value());
+
+    EXPECT_EQ(orderBook.getLastTrade()->getTradeId().value, 1);
+    EXPECT_EQ(orderBook.getLastTrade()->getBuyOrderId().value, 1002);
+    EXPECT_EQ(orderBook.getLastTrade()->getSellOrderId().value, 1001);
+    EXPECT_EQ(orderBook.getLastTrade()->getTradeSymbol().value, "BTC-GBP");
+    EXPECT_EQ(orderBook.getLastTrade()->getTradePrice().value, 50000);
+    EXPECT_EQ(orderBook.getLastTrade()->getTradeQuantity().value, 25);
+}
+
+TEST(CMEOrderBookTests, PartialFillCreatesCorrectTradeQuantity)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder restingSell(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::SELL,
+        CMEPrice(50000),
+        CMEQuantity(100));
+
+    CMEOrder incomingBuy(
+        CMEOrderId(1002),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(40));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(restingSell));
+    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuy));
+
+    ASSERT_TRUE(orderBook.getLastTrade().has_value());
+
+    EXPECT_EQ(orderBook.getLastTrade()->getTradeId().value, 1);
+    EXPECT_EQ(orderBook.getLastTrade()->getBuyOrderId().value, 1002);
+    EXPECT_EQ(orderBook.getLastTrade()->getSellOrderId().value, 1001);
+    EXPECT_EQ(orderBook.getLastTrade()->getTradePrice().value, 50000);
+    EXPECT_EQ(orderBook.getLastTrade()->getTradeQuantity().value, 40);
+}
+
+TEST(CMEOrderBookTests, LargerIncomingOrderCreatesCorrectTrade)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder restingSell(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::SELL,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    CMEOrder incomingBuy(
+        CMEOrderId(1002),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(100));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(restingSell));
+    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuy));
+
+    ASSERT_TRUE(orderBook.getLastTrade().has_value());
+
+    EXPECT_EQ(orderBook.getLastTrade()->getTradeId().value, 1);
+    EXPECT_EQ(orderBook.getLastTrade()->getBuyOrderId().value, 1002);
+    EXPECT_EQ(orderBook.getLastTrade()->getSellOrderId().value, 1001);
+    EXPECT_EQ(orderBook.getLastTrade()->getTradePrice().value, 50000);
+    EXPECT_EQ(orderBook.getLastTrade()->getTradeQuantity().value, 25);
+
+    EXPECT_EQ(
+        orderBook.getBuyLevel(CMEPrice(50000))
+            .getFrontOrder()
+            .getOrderRemainingQuantity().value,
+        75);
+}
+
+TEST(CMEOrderBookTests, TradeIdentifiersIncreaseSequentially)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    CMEOrder restingSellOne(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::SELL,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    CMEOrder incomingBuyOne(
+        CMEOrderId(1002),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(restingSellOne));
+    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuyOne));
+
+    ASSERT_TRUE(orderBook.getLastTrade().has_value());
+    EXPECT_EQ(orderBook.getLastTrade()->getTradeId().value, 1);
+
+    CMEOrder restingSellTwo(
+        CMEOrderId(1003),
+        CMESymbol("BTC-GBP"),
+        CMESide::SELL,
+        CMEPrice(51000),
+        CMEQuantity(10));
+
+    CMEOrder incomingBuyTwo(
+        CMEOrderId(1004),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(51000),
+        CMEQuantity(10));
+
+    EXPECT_TRUE(orderBook.addLimitOrder(restingSellTwo));
+    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuyTwo));
+
+    ASSERT_TRUE(orderBook.getLastTrade().has_value());
+    EXPECT_EQ(orderBook.getLastTrade()->getTradeId().value, 2);
+}
