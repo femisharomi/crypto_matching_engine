@@ -19,7 +19,7 @@ public:
     CMESymbol getSymbol() const;
 
     /* Validates and adds a limit order to the correct side of the order book. */
-    bool addLimitOrder(const CMEOrder &order);
+    bool addLimitOrder(CMEOrder incomingOrder);
 
     /* Returns the number of buy price levels currently stored. */
     std::size_t getBuyLevelCount() const;
@@ -61,11 +61,8 @@ private:
     /* Returns whether an incoming order crosses the best opposite price. */
     bool canMatch(const CMEOrder &incomingOrder) const;
 
-    /* Returns whether the incoming and resting orders have equal remaining quantities. */
-    bool hasMatchingQuantity(const CMEOrder &incomingOrder, const CMEOrder &restingOrder) const;
-
-    /* Attempts to fully match an incoming order against the best opposite order. */
-    bool tryMatchOrder(const CMEOrder &incomingOrder);
+    /* Attempts to match an incoming order against the best opposite order. */
+    bool tryMatchOrder(CMEOrder &incomingOrder);
 
     /* Removes an empty price level from the selected side of the order book. */
     void removeEmptyLevel(CMESide side, CMEPrice price);

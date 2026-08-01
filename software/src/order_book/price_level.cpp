@@ -32,6 +32,11 @@ const CMEOrder& CMEPriceLevel::getFrontOrder() const
     return orders.front();
 }
 
+CMEOrder& CMEPriceLevel::getFrontOrder()
+{
+    return orders.front();
+}
+
 /* Removes the order that has waited at this price level for the longest time. */
 bool CMEPriceLevel::removeFrontOrder()
 {

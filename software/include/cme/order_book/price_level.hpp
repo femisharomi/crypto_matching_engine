@@ -26,6 +26,9 @@ class CMEPriceLevel{
     /* Returns the order that has waited at this price level for the longest time. */
     const CMEOrder& getFrontOrder() const;
 
+    /* Returns modifiable access to the order that has waited at this price level the longest. */
+    CMEOrder& getFrontOrder();
+
     /* Removes the order that has waited at this price level for the longest time. */
     bool removeFrontOrder();
 
