@@ -6,7 +6,7 @@
 // ============================================================================
 
 // ============================================================================
-// 1. CME SIDE TESTS
+// CME SIDE TESTS
 // ============================================================================
 
 /* Checks that the buy side is different from the sell side. */
@@ -19,7 +19,7 @@ TEST(CMECoreTypesTests, BuyIsDifferentFromSell)
 }
 
 // ============================================================================
-// 2. CME PRICE TESTS
+// CME PRICE TESTS
 // ============================================================================
 
 /* Checks that two prices containing the same value are equal. */
@@ -95,7 +95,7 @@ TEST(CMECoreTypesTests, EqualPricesAreGreaterThanOrEqualToEachOther)
 }
 
 // ============================================================================
-// 3. CME QUANTITY TESTS
+// CME QUANTITY TESTS
 // ============================================================================
 
 /* Checks that two quantities containing the same value are equal. */
@@ -171,7 +171,7 @@ TEST(CMECoreTypesTests, EqualQuantitiesAreGreaterThanOrEqualToEachOther)
 }
 
 // ============================================================================
-// 4. CME ORDER ID TESTS
+// CME ORDER ID TESTS
 // ============================================================================
 
 /* Checks that two order IDs containing the same value are equal. */
@@ -193,7 +193,7 @@ TEST(CMECoreTypesTests, OrderIdsWithDifferentValuesAreNotEqual)
 }
 
 // ============================================================================
-// 5. CME SYMBOL TESTS
+// CME SYMBOL TESTS
 // ============================================================================
 
 /* Checks that two symbols containing the same value are equal. */
@@ -212,4 +212,19 @@ TEST(CMECoreTypesTests, SymbolsWithDifferentValuesAreNotEqual)
     CMESymbol second_symbol("ETH-GBP");
 
     EXPECT_NE(first_symbol, second_symbol);
+}
+
+// ============================================================================
+// TIME IN FORCE TESTS
+// ============================================================================
+
+TEST(CMECoreTypesTests, TimeInForceValuesAreDifferent)
+{
+    CMETimeInForce goodTillCancelled = CMETimeInForce::GTC;
+    CMETimeInForce immediateOrCancel = CMETimeInForce::IOC;
+    CMETimeInForce fillOrKill = CMETimeInForce::FOK;
+
+    EXPECT_NE(goodTillCancelled, immediateOrCancel);
+    EXPECT_NE(immediateOrCancel, fillOrKill);
+    EXPECT_NE(goodTillCancelled, fillOrKill);
 }

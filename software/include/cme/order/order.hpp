@@ -14,22 +14,27 @@
  */
 class CMEOrder {
 public:    
-    // Constructor 
+    /* Constructs a new order with the specified details. */
     CMEOrder(
         CMEOrderId order_id,
         CMESymbol symbol,
         CMESide side,
         CMEPrice price,
         CMEQuantity quantity,
-        bool marketOrder = false
+        bool marketOrder = false,
+        CMETimeInForce timeInForce = CMETimeInForce::GTC
     );
 
+    /* Returns the unique identifier of the order. */
     CMEOrderId getOrderId() const;
 
+    /* Returns the trading symbol for the order. */
     CMESymbol getOrderSymbol() const;
 
+    /* Returns whether the order is a BUY or SELL order. */
     CMESide getOrderSide() const;
 
+    //* Returns the limit price of the order. */
     CMEPrice getOrderPrice() const;
 
     /* This gets the original quantity the order started with. */
@@ -47,15 +52,33 @@ public:
     /* Returns whether this order is a marker order. */
     bool isMarket() const;
 
+    /* Returns the Time In Force assigned to this order. */
+    CMETimeInForce getTimeInForce() const;
+
+
 private:
+    // Unique identifier assigned to this order.
     CMEOrderId orderId;
+
+    // Trading instrument that this order belongs to (e.g. BTC-GBP).
     CMESymbol orderSymbol;
+
+    // Indicates whether the order is a BUY or SELL order.
     CMESide orderSide;
+
+    // The limit price of the order. Ignored for market orders.
     CMEPrice orderPrice;
+
+    // Total quantity requested when the order was created.
     CMEQuantity originalQuantity;
+
+    // Quantity that has not yet been filled.
     CMEQuantity remainingQuantity;
-    
+
     // Indicates whether this order is a market order.
     bool isMarketOrder;
+
+    // The Time In Force assigned to this order.
+    CMETimeInForce orderTimeInForce;
 };
 #endif //CME_ORDER_ORDER_HPP

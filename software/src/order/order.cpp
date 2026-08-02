@@ -6,14 +6,16 @@ CMEOrder::CMEOrder(
     CMESide side,
     CMEPrice price,
     CMEQuantity quantity,
-    bool marketOrder
+    bool marketOrder,
+    CMETimeInForce timeInForce
 ) : orderId(order_id), 
     orderSymbol(symbol), 
     orderSide(side), 
     orderPrice(price), 
     originalQuantity(quantity), 
     remainingQuantity(quantity),
-    isMarketOrder(marketOrder){}
+    isMarketOrder(marketOrder),
+    orderTimeInForce(timeInForce){}
 
 CMEOrderId CMEOrder::getOrderId() const
 {
@@ -62,4 +64,9 @@ bool CMEOrder::applyFill(CMEQuantity fillQuantity)
 bool CMEOrder::isMarket() const
 {
     return isMarketOrder;
+}
+
+CMETimeInForce CMEOrder::getTimeInForce() const
+{
+    return orderTimeInForce;
 }
