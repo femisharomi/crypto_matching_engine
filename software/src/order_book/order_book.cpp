@@ -314,49 +314,45 @@ bool CMEOrderBook::cancelOrder(CMEOrderId orderId)
     return false;
 }
 
-bool CMEOrderBook::findOrder(CMEOrderId orderId, CMEOrder& foundOrder) const
+std::optional<CMEOrder> CMEOrderBook::findOrder(CMEOrderId orderId) const
 {
-// 1. Check Buy Levels
-for(std::map<std::int64_t, CMEPriceLevel>::const_iterator it = buyLevels.begin(); it != buyLevels.end();)
-{
-    if(it->second.containsOrder(orderId))
+    // Check every buy price level.
+    for (std::map<std::int64_t, CMEPriceLevel>::const_iterator it = buyLevels.begin();
+         it != buyLevels.end();
+         ++it)
     {
-        foundOrder = it->second.getOrder(orderId);
-        return true;
+        if (it->second.containsOrder(orderId))
+        {
+            return it->second.getOrder(orderId);
+        }
     }
-    else
-    {
-        ++it;
-    }
-}
 
-// 2. Check Sell Levels
-    for(std::map<std::int64_t, CMEPriceLevel>::const_iterator it = sellLevels.begin(); it != sellLevels.end();)
-{
-    if(it->second.containsOrder(orderId))
+    // Check every sell price level.
+    for (std::map<std::int64_t, CMEPriceLevel>::const_iterator it = sellLevels.begin();
+         it != sellLevels.end();
+         ++it)
     {
-        foundOrder = it->second.getOrder(orderId);
-        return true;
+        if (it->second.containsOrder(orderId))
+        {
+            return it->second.getOrder(orderId);
+        }
     }
-    else
-    {
-        ++it;
-    }
-}
 
-return false;
+    return std::nullopt;
 }
 
 bool CMEOrderBook::modifyOrder(CMEOrderId orderId, CMEPrice newPrice, CMEQuantity newQuantity)
 {
-    // Creation of Order Object with invalid variables - Shall fail if CMEOrderBook::findOrder() fails to return an existing order.
-    CMEOrder foundOrder(CMEOrderId(-1),CMESymbol(""),CMESide(CMESide::UNKNOWN),CMEPrice(-1), CMEQuantity(-1));
-    
-    if(!findOrder(orderId, foundOrder)) return false;
+    std::optional<CMEOrder> foundOrder = findOrder(orderId);
 
-    CMEOrder replacementOrder(foundOrder.getOrderId(), 
-                              foundOrder.getOrderSymbol(), 
-                              foundOrder.getOrderSide(), 
+    if (!foundOrder.has_value())
+    {
+        return false;
+    }
+
+    CMEOrder replacementOrder(foundOrder->getOrderId(), 
+                              foundOrder->getOrderSymbol(), 
+                              foundOrder->getOrderSide(), 
                               newPrice, 
                               newQuantity);
                               

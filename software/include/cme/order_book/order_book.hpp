@@ -87,7 +87,7 @@ private:
     /* Removes an empty price level from the selected side of the order book. */
     void removeEmptyLevel(CMESide side, CMEPrice price);
 
-    /* Finds and copies the order with the supplied identifier. */
-    bool findOrder(CMEOrderId orderId, CMEOrder& foundOrder) const;
+    /* Returns the order with the supplied identifier if it exists. */
+    std::optional<CMEOrder> findOrder(CMEOrderId orderId) const;
 };
 #endif // CME_ORDER_BOOK_ORDER_BOOK_HPP

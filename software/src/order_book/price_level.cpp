@@ -84,16 +84,13 @@ const CMEOrder& CMEPriceLevel::getOrder(CMEOrderId orderId) const
 
 bool CMEPriceLevel::containsOrder(CMEOrderId orderId) const
 {
-    for(std::deque<CMEOrder>::const_iterator it = orders.begin(); it != orders.end();)
+    for (const CMEOrder& order : orders)
     {
-        if(it->getOrderId() == orderId)
+        if (order.getOrderId() == orderId)
         {
             return true;
         }
-        else
-        {
-            ++it;
-        }
     }
+
     return false;
 }
