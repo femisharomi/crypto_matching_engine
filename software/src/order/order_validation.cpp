@@ -12,7 +12,7 @@ CMEOrderValidationResult CMEOrderValidator::validateOrder(const CMEOrder& order)
         return CMEOrderValidationResult::EMPTY_SYMBOL;
     }
     
-    if (order.getOrderPrice().value <= 0) 
+    if (!order.isMarket() && order.getOrderPrice().value <= 0) 
     {
         return CMEOrderValidationResult::INVALID_PRICE; 
     }

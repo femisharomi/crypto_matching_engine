@@ -20,7 +20,8 @@ public:
         CMESymbol symbol,
         CMESide side,
         CMEPrice price,
-        CMEQuantity quantity
+        CMEQuantity quantity,
+        bool marketOrder = false
     );
 
     CMEOrderId getOrderId() const;
@@ -37,9 +38,14 @@ public:
     /* Returns the quantity that has not yet been filled. */
     CMEQuantity getOrderRemainingQuantity() const; 
 
+    /* Checks if the order has been completely executed. */
     bool isOrderFilled() const;
 
+    /* Reduces the remaining order volume by the executed fill quantity. */
     bool applyFill(CMEQuantity fillQuantity); 
+
+    /* Returns whether this order is a marker order. */
+    bool isMarket() const;
 
 private:
     CMEOrderId orderId;
@@ -48,5 +54,8 @@ private:
     CMEPrice orderPrice;
     CMEQuantity originalQuantity;
     CMEQuantity remainingQuantity;
+    
+    // Indicates whether this order is a market order.
+    bool isMarketOrder;
 };
 #endif //CME_ORDER_ORDER_HPP

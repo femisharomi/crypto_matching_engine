@@ -20,8 +20,8 @@ public:
     /* Returns the trading symbol represented by this order book. */
     CMESymbol getSymbol() const;
 
-    /* Validates and adds a limit order to the correct side of the order book. */
-    bool addLimitOrder(CMEOrder incomingOrder);
+    /* Validates and adds a LIMIT or MARKET order to the correct side of the order book. */
+    bool addOrder(CMEOrder incomingOrder);
 
     /* Returns the number of buy price levels currently stored. */
     std::size_t getBuyLevelCount() const;

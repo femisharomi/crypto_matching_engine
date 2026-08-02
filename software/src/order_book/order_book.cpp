@@ -11,7 +11,7 @@ CMESymbol CMEOrderBook::getSymbol() const
     return bookSymbol;
 }
 
-bool CMEOrderBook::addLimitOrder(CMEOrder incomingOrder)
+bool CMEOrderBook::addOrder(CMEOrder incomingOrder)
 {
     CMEOrderValidationResult validationResult =
         orderValidator.validateOrder(incomingOrder);
@@ -29,6 +29,11 @@ bool CMEOrderBook::addLimitOrder(CMEOrder incomingOrder)
     if (tryMatchOrder(incomingOrder))
     {
         return true;
+    }
+
+    if(incomingOrder.isMarket() && incomingOrder.getOrderRemainingQuantity().value != 0)
+    {
+        return false;
     }
 
     CMEPrice orderPrice = incomingOrder.getOrderPrice();
@@ -109,11 +114,13 @@ bool CMEOrderBook::canMatch(const CMEOrder &incomingOrder) const
     {
         case CMESide::BUY:
             if(!hasSellLevels()) return false;
-
+            if(incomingOrder.isMarket()) return true;
+            
             return incomingOrder.getOrderPrice() >= getBestAsk();
 
         case CMESide::SELL:
             if(!hasBuyLevels()) return false;
+            if(incomingOrder.isMarket()) return true;
 
            return incomingOrder.getOrderPrice() <= getBestBid(); 
            
@@ -363,5 +370,5 @@ bool CMEOrderBook::modifyOrder(CMEOrderId orderId, CMEPrice newPrice, CMEQuantit
 
     if(!cancelOrder(orderId)) return false;
 
-    return addLimitOrder(replacementOrder);
+    return addOrder(replacementOrder);
 }
