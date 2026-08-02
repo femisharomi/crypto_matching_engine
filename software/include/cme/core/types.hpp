@@ -8,7 +8,8 @@
 enum class CMESide
 {
     BUY,
-    SELL
+    SELL,
+    UNKNOWN
 };
 
 /* Represents a price. */

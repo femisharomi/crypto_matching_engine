@@ -153,8 +153,7 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
             {
                 if (!restingOrder.applyFill(incomingRemaining))
                 {
-                    throw std::runtime_error(
-                        "Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to resting order!");
+                    throw std::runtime_error("Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to resting order!");
                 }
                 createTrade(incomingOrder, restingOrder, incomingRemaining);
                 return true;
@@ -162,8 +161,7 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
 
             if (!incomingOrder.applyFill(restingRemaining))
             {
-                throw std::runtime_error(
-                    "Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to incoming order!");
+                throw std::runtime_error("Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to incoming order!");
             }
 
             createTrade(incomingOrder, restingOrder, restingRemaining);
@@ -193,8 +191,7 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
             {
                 if (!restingOrder.applyFill(incomingRemaining))
                 {
-                    throw std::runtime_error(
-                        "Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to resting order!");
+                    throw std::runtime_error("Function: CMEOrderBook::tryMatchOrder() - Failed to apply fill to resting order!");
                 }
                 createTrade(incomingOrder, restingOrder, incomingRemaining);
                 return true;
@@ -213,8 +210,7 @@ bool CMEOrderBook::tryMatchOrder(CMEOrder& incomingOrder)
         }
 
         default:
-            throw std::runtime_error(
-                "Function: CMEOrderBook::tryMatchOrder() - Unknown market side encountered!");
+            throw std::runtime_error("Function: CMEOrderBook::tryMatchOrder() - Unknown market side encountered!");
     }
 }
 
@@ -249,8 +245,7 @@ void CMEOrderBook::removeEmptyLevel(CMESide side, CMEPrice levelPrice)
         }
         
         default:
-            throw std::runtime_error(
-                "Function: CMEOrderBook::removeEmptyLevel() - Unknown market side encountered!");
+            throw std::runtime_error("Function: CMEOrderBook::removeEmptyLevel() - Unknown market side encountered!");
     }
 }
 
@@ -317,4 +312,56 @@ bool CMEOrderBook::cancelOrder(CMEOrderId orderId)
 
     // 3. Order not found in any level
     return false;
+}
+
+std::optional<CMEOrder> CMEOrderBook::findOrder(CMEOrderId orderId) const
+{
+    // Check every buy price level.
+    for (std::map<std::int64_t, CMEPriceLevel>::const_iterator it = buyLevels.begin();
+         it != buyLevels.end();
+         ++it)
+    {
+        if (it->second.containsOrder(orderId))
+        {
+            return it->second.getOrder(orderId);
+        }
+    }
+
+    // Check every sell price level.
+    for (std::map<std::int64_t, CMEPriceLevel>::const_iterator it = sellLevels.begin();
+         it != sellLevels.end();
+         ++it)
+    {
+        if (it->second.containsOrder(orderId))
+        {
+            return it->second.getOrder(orderId);
+        }
+    }
+
+    return std::nullopt;
+}
+
+bool CMEOrderBook::modifyOrder(CMEOrderId orderId, CMEPrice newPrice, CMEQuantity newQuantity)
+{
+    std::optional<CMEOrder> foundOrder = findOrder(orderId);
+
+    if (!foundOrder.has_value())
+    {
+        return false;
+    }
+
+    CMEOrder replacementOrder(foundOrder->getOrderId(), 
+                              foundOrder->getOrderSymbol(), 
+                              foundOrder->getOrderSide(), 
+                              newPrice, 
+                              newQuantity);
+                              
+    if(orderValidator.validateOrder(replacementOrder) != CMEOrderValidationResult::VALID)
+    {
+        return false;
+    }
+
+    if(!cancelOrder(orderId)) return false;
+
+    return addLimitOrder(replacementOrder);
 }

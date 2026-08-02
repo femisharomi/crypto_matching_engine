@@ -3,6 +3,15 @@
 
 #include "cme/core/types.hpp"
 
+/**
+ * @brief Constructs an immutable representation of an order.
+ * 
+ * @param order_id Unique exchange identifier assigned to this order.
+ * @param symbol   The specific product or financial instrument token.
+ * @param side     Order direction (BUY/BID or SELL/ASK).
+ * @param price    The limit price represented in scaled integer format.
+ * @param quantity The total contract or share volume requested.
+ */
 class CMEOrder {
 public:    
     // Constructor 

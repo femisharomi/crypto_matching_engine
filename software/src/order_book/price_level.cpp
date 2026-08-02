@@ -1,4 +1,5 @@
 #include "cme/order_book/price_level.hpp"
+#include <stdexcept>
 
 CMEPriceLevel::CMEPriceLevel(CMEPrice price) : levelPrice(price)
 {
@@ -63,4 +64,33 @@ bool CMEPriceLevel::removeOrder(CMEOrderId orderId)
     }
     
     return false; // Return false if the orderId was not found
+}
+
+const CMEOrder& CMEPriceLevel::getOrder(CMEOrderId orderId) const
+{
+    // Use a range-based for loop for clean, non-modifying read access
+    for (const CMEOrder& order : orders)
+    {
+        if (order.getOrderId() == orderId)
+        {
+            return order;
+        }
+    }
+
+    // Fix the exception message to reflect the correct class name
+    throw std::runtime_error("Function: CMEPriceLevel::getOrder() - The requested order could not be found.");
+}
+
+
+bool CMEPriceLevel::containsOrder(CMEOrderId orderId) const
+{
+    for (const CMEOrder& order : orders)
+    {
+        if (order.getOrderId() == orderId)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
