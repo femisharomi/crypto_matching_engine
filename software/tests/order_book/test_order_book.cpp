@@ -27,7 +27,7 @@ TEST(CMEOrderBookTests, AddsBuyOrderToBuySide)
 
     CMEOrder newOrder(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(50));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(newOrder));
+    EXPECT_TRUE(orderBook.addOrder(newOrder));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
@@ -44,8 +44,8 @@ TEST(CMEOrderBookTests, AddsBuyOrdersAtSamePriceToOneLevel)
     CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(50));
     CMEOrder newOrder2(CMEOrderId(1002), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(newOrder1));
-    EXPECT_TRUE(orderBook.addLimitOrder(newOrder2));
+    EXPECT_TRUE(orderBook.addOrder(newOrder1));
+    EXPECT_TRUE(orderBook.addOrder(newOrder2));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
 
@@ -61,8 +61,8 @@ TEST(CMEOrderBookTests, CreatesSeparateBuyLevelsForDifferentPrices)
     CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(50));
     CMEOrder newOrder2(CMEOrderId(1002), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(49000), CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(newOrder1));
-    EXPECT_TRUE(orderBook.addLimitOrder(newOrder2));
+    EXPECT_TRUE(orderBook.addOrder(newOrder1));
+    EXPECT_TRUE(orderBook.addOrder(newOrder2));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 2);
 
@@ -79,7 +79,7 @@ TEST(CMEOrderBookTests, AddsSellOrderToSellSide)
 
     CMEOrder newOrder(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::SELL, CMEPrice(51000), CMEQuantity(50));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(newOrder));
+    EXPECT_TRUE(orderBook.addOrder(newOrder));
 
     EXPECT_EQ(orderBook.getSellLevelCount(), 1);
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
@@ -96,8 +96,8 @@ TEST(CMEOrderBookTests, CreatesSeparateSellLevelsForDifferentPrices)
     CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::SELL, CMEPrice(50000), CMEQuantity(50));
     CMEOrder newOrder2(CMEOrderId(1002), CMESymbol("BTC-GBP"), CMESide::SELL, CMEPrice(51000), CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(newOrder1));
-    EXPECT_TRUE(orderBook.addLimitOrder(newOrder2));
+    EXPECT_TRUE(orderBook.addOrder(newOrder1));
+    EXPECT_TRUE(orderBook.addOrder(newOrder2));
 
     EXPECT_EQ(orderBook.getSellLevelCount(), 2);
 
@@ -115,7 +115,7 @@ TEST(CMEOrderBookTests, RejectsOrderForDifferentSymbol)
 
     CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("ETH-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(50));
 
-    EXPECT_FALSE(orderBook.addLimitOrder(newOrder1));
+    EXPECT_FALSE(orderBook.addOrder(newOrder1));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
@@ -131,7 +131,7 @@ TEST(CMEOrderBookTests, RejectsLimitOrderWithZeroOrderId)
 
     CMEOrder newOrder1(CMEOrderId(0), CMESymbol("ETH-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(50));
 
-    EXPECT_FALSE(orderBook.addLimitOrder(newOrder1));
+    EXPECT_FALSE(orderBook.addOrder(newOrder1));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
@@ -144,7 +144,7 @@ TEST(CMEOrderBookTests, RejectsLimitOrderWithEmptySymbol)
 
     CMEOrder newOrder1(CMEOrderId(1), CMESymbol(""), CMESide::BUY, CMEPrice(50000), CMEQuantity(50));
 
-    EXPECT_FALSE(orderBook.addLimitOrder(newOrder1));
+    EXPECT_FALSE(orderBook.addOrder(newOrder1));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
@@ -157,7 +157,7 @@ TEST(CMEOrderBookTests, RejectsLimitOrderWithZeroPrice)
 
     CMEOrder newOrder1(CMEOrderId(1), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(0), CMEQuantity(50));
 
-    EXPECT_FALSE(orderBook.addLimitOrder(newOrder1));
+    EXPECT_FALSE(orderBook.addOrder(newOrder1));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
@@ -170,7 +170,7 @@ TEST(CMEOrderBookTests, RejectsLimitOrderWithNegativePrice)
 
     CMEOrder newOrder1(CMEOrderId(1), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(-5), CMEQuantity(50));
 
-    EXPECT_FALSE(orderBook.addLimitOrder(newOrder1));
+    EXPECT_FALSE(orderBook.addOrder(newOrder1));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
@@ -183,7 +183,7 @@ TEST(CMEOrderBookTests, RejectsLimitOrderWithZeroQuantity)
 
     CMEOrder newOrder1(CMEOrderId(1), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50), CMEQuantity(0));
 
-    EXPECT_FALSE(orderBook.addLimitOrder(newOrder1));
+    EXPECT_FALSE(orderBook.addOrder(newOrder1));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
@@ -196,7 +196,7 @@ TEST(CMEOrderBookTests, RejectsLimitOrderWithNegativeQuantity)
 
     CMEOrder newOrder1(CMEOrderId(1), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50), CMEQuantity(-5));
 
-    EXPECT_FALSE(orderBook.addLimitOrder(newOrder1));
+    EXPECT_FALSE(orderBook.addOrder(newOrder1));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
@@ -212,12 +212,12 @@ TEST(CMEOrderBookTests, RejectedLimitOrderDoesNotModifyExistingLevels)
 
     CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(50));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(newOrder1));
+    EXPECT_TRUE(orderBook.addOrder(newOrder1));
     EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
     EXPECT_EQ(orderBook.getBuyLevel(CMEPrice(50000)).getOrderCount(), 1);
 
     CMEOrder newOrder2(CMEOrderId(1002), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(0));
-    EXPECT_FALSE(orderBook.addLimitOrder(newOrder2));
+    EXPECT_FALSE(orderBook.addOrder(newOrder2));
     EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
     EXPECT_EQ(orderBook.getBuyLevel(CMEPrice(50000)).getOrderCount(), 1);
     EXPECT_EQ(orderBook.getBuyLevel(CMEPrice(50000)).getFrontOrder().getOrderId().value, 1001);
@@ -229,11 +229,11 @@ TEST(CMEOrderBookTests, AcceptsValidLimitOrderAfterRejectedOrder)
     CMEOrderBook orderBook(btc_gbp);
 
     CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(0), CMEQuantity(50));
-    EXPECT_FALSE(orderBook.addLimitOrder(newOrder1));
+    EXPECT_FALSE(orderBook.addOrder(newOrder1));
 
     CMEOrder newOrder2(CMEOrderId(1002), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(50));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(newOrder2));
+    EXPECT_TRUE(orderBook.addOrder(newOrder2));
     EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
   
     EXPECT_EQ(orderBook.getBuyLevel(CMEPrice(50000)).getFrontOrder().getOrderId().value, 1002);
@@ -264,7 +264,7 @@ TEST(CMEOrderBookTests, ReturnsSingleBuyPriceAsBestBid)
     CMEOrderBook orderBook(btc_gbp);
 
     CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(502), CMEQuantity(50));
-    orderBook.addLimitOrder(newOrder1);
+    orderBook.addOrder(newOrder1);
 
     EXPECT_EQ(orderBook.getBestBid(), CMEPrice(502));
 }
@@ -277,9 +277,9 @@ TEST(CMEOrderBookTests, ReturnsHighestBuyPrice)
     CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(49800), CMEQuantity(50));
     CMEOrder newOrder2(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(50000), CMEQuantity(50));
     CMEOrder newOrder3(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(49900), CMEQuantity(50));
-    orderBook.addLimitOrder(newOrder1);
-    orderBook.addLimitOrder(newOrder2);
-    orderBook.addLimitOrder(newOrder3);
+    orderBook.addOrder(newOrder1);
+    orderBook.addOrder(newOrder2);
+    orderBook.addOrder(newOrder3);
 
     EXPECT_EQ(orderBook.getBestBid(), CMEPrice(50000));
 }
@@ -290,7 +290,7 @@ TEST(CMEOrderBookTests, ReturnsSingleSellPriceAsBestAsk)
     CMEOrderBook orderBook(btc_gbp);
 
     CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::SELL, CMEPrice(50000), CMEQuantity(50));
-    orderBook.addLimitOrder(newOrder1);
+    orderBook.addOrder(newOrder1);
 
     EXPECT_EQ(orderBook.getBestAsk(), CMEPrice(50000));
 }
@@ -303,9 +303,9 @@ TEST(CMEOrderBookTests, ReturnsLowestSellPrice)
     CMEOrder newOrder1(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::SELL, CMEPrice(51000), CMEQuantity(50));
     CMEOrder newOrder2(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::SELL, CMEPrice(50900), CMEQuantity(50));
     CMEOrder newOrder3(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::SELL, CMEPrice(51200), CMEQuantity(50));
-    orderBook.addLimitOrder(newOrder1);
-    orderBook.addLimitOrder(newOrder2);
-    orderBook.addLimitOrder(newOrder3);
+    orderBook.addOrder(newOrder1);
+    orderBook.addOrder(newOrder2);
+    orderBook.addOrder(newOrder3);
 
     EXPECT_EQ(orderBook.getBestAsk(), CMEPrice(50900));
 }
@@ -322,12 +322,12 @@ TEST(CMEOrderBookTests, ReturnsCorrectBestBidAndBestAsk)
     CMEOrder newOrderBuy3(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::BUY, CMEPrice(49900), CMEQuantity(50));
     CMEOrder newOrderSell3(CMEOrderId(1001), CMESymbol("BTC-GBP"), CMESide::SELL, CMEPrice(51200), CMEQuantity(50));
 
-    orderBook.addLimitOrder(newOrderSell1);
-    orderBook.addLimitOrder(newOrderSell2);
-    orderBook.addLimitOrder(newOrderSell3);
-    orderBook.addLimitOrder(newOrderBuy1);
-    orderBook.addLimitOrder(newOrderBuy2);
-    orderBook.addLimitOrder(newOrderBuy3);
+    orderBook.addOrder(newOrderSell1);
+    orderBook.addOrder(newOrderSell2);
+    orderBook.addOrder(newOrderSell3);
+    orderBook.addOrder(newOrderBuy1);
+    orderBook.addOrder(newOrderBuy2);
+    orderBook.addOrder(newOrderBuy3);
 
     EXPECT_EQ(orderBook.getBestAsk(), CMEPrice(50900));
     EXPECT_EQ(orderBook.getBestBid(), CMEPrice(50000));
@@ -347,7 +347,7 @@ TEST(CMEOrderBookTests, MatchesBuyOrderWithBestAsk)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(sellOrder));
+    EXPECT_TRUE(orderBook.addOrder(sellOrder));
 
     CMEOrder buyOrder(
         CMEOrderId(1002),
@@ -356,7 +356,7 @@ TEST(CMEOrderBookTests, MatchesBuyOrderWithBestAsk)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(buyOrder));
+    EXPECT_TRUE(orderBook.addOrder(buyOrder));
 
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
@@ -373,7 +373,7 @@ TEST(CMEOrderBookTests, MatchesBuyOrderPricedAboveBestAsk)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    orderBook.addLimitOrder(sellOrder);
+    orderBook.addOrder(sellOrder);
 
     CMEOrder buyOrder(
         CMEOrderId(1002),
@@ -382,7 +382,7 @@ TEST(CMEOrderBookTests, MatchesBuyOrderPricedAboveBestAsk)
         CMEPrice(51000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(buyOrder));
+    EXPECT_TRUE(orderBook.addOrder(buyOrder));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
@@ -399,7 +399,7 @@ TEST(CMEOrderBookTests, MatchesSellOrderWithBestBid)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    orderBook.addLimitOrder(buyOrder);
+    orderBook.addOrder(buyOrder);
 
     CMEOrder sellOrder(
         CMEOrderId(1002),
@@ -408,7 +408,7 @@ TEST(CMEOrderBookTests, MatchesSellOrderWithBestBid)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(sellOrder));
+    EXPECT_TRUE(orderBook.addOrder(sellOrder));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
@@ -425,7 +425,7 @@ TEST(CMEOrderBookTests, MatchesSellOrderPricedBelowBestBid)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    orderBook.addLimitOrder(buyOrder);
+    orderBook.addOrder(buyOrder);
 
     CMEOrder sellOrder(
         CMEOrderId(1002),
@@ -434,7 +434,7 @@ TEST(CMEOrderBookTests, MatchesSellOrderPricedBelowBestBid)
         CMEPrice(49000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(sellOrder));
+    EXPECT_TRUE(orderBook.addOrder(sellOrder));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
@@ -463,8 +463,8 @@ TEST(CMEOrderBookTests, SmallerIncomingBuyPartiallyFillsRestingSell)
         CMEQuantity(40)
     );
 
-    EXPECT_TRUE(orderBook.addLimitOrder(restingSell));
-    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuy));
+    EXPECT_TRUE(orderBook.addOrder(restingSell));
+    EXPECT_TRUE(orderBook.addOrder(incomingBuy));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
     EXPECT_EQ(orderBook.getSellLevelCount(), 1);
@@ -497,8 +497,8 @@ TEST(CMEOrderBookTests, SmallerIncomingSellPartiallyFillsRestingBuy)
         CMEQuantity(30)
     );
 
-    EXPECT_TRUE(orderBook.addLimitOrder(restingBuy));
-    EXPECT_TRUE(orderBook.addLimitOrder(incomingSell));
+    EXPECT_TRUE(orderBook.addOrder(restingBuy));
+    EXPECT_TRUE(orderBook.addOrder(incomingSell));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
@@ -531,8 +531,8 @@ TEST(CMEOrderBookTests, LargerIncomingBuyRemainsAfterFillingRestingSell)
         CMEQuantity(100)
     );
 
-    EXPECT_TRUE(orderBook.addLimitOrder(restingSell));
-    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuy));
+    EXPECT_TRUE(orderBook.addOrder(restingSell));
+    EXPECT_TRUE(orderBook.addOrder(incomingBuy));
 
     EXPECT_EQ(orderBook.getSellLevelCount(), 0);
     EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
@@ -565,8 +565,8 @@ TEST(CMEOrderBookTests, LargerIncomingSellRemainsAfterFillingRestingBuy)
         CMEQuantity(75)
     );
 
-    EXPECT_TRUE(orderBook.addLimitOrder(restingBuy));
-    EXPECT_TRUE(orderBook.addLimitOrder(incomingSell));
+    EXPECT_TRUE(orderBook.addOrder(restingBuy));
+    EXPECT_TRUE(orderBook.addOrder(incomingSell));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
     EXPECT_EQ(orderBook.getSellLevelCount(), 1);
@@ -607,9 +607,9 @@ TEST(CMEOrderBookTests, PartiallyFilledRestingOrderKeepsFifoPosition)
         CMEQuantity(40)
     );
 
-    EXPECT_TRUE(orderBook.addLimitOrder(firstSell));
-    EXPECT_TRUE(orderBook.addLimitOrder(secondSell));
-    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuy));
+    EXPECT_TRUE(orderBook.addOrder(firstSell));
+    EXPECT_TRUE(orderBook.addOrder(secondSell));
+    EXPECT_TRUE(orderBook.addOrder(incomingBuy));
 
     const CMEPriceLevel& level =
         orderBook.getSellLevel(CMEPrice(50000));
@@ -644,8 +644,8 @@ TEST(CMEOrderBookTests, EqualQuantityMatchCreatesTrade)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(restingSell));
-    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuy));
+    EXPECT_TRUE(orderBook.addOrder(restingSell));
+    EXPECT_TRUE(orderBook.addOrder(incomingBuy));
 
     ASSERT_TRUE(orderBook.getLastTrade().has_value());
 
@@ -675,8 +675,8 @@ TEST(CMEOrderBookTests, PartialFillCreatesCorrectTradeQuantity)
         CMEPrice(50000),
         CMEQuantity(40));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(restingSell));
-    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuy));
+    EXPECT_TRUE(orderBook.addOrder(restingSell));
+    EXPECT_TRUE(orderBook.addOrder(incomingBuy));
 
     ASSERT_TRUE(orderBook.getLastTrade().has_value());
 
@@ -705,8 +705,8 @@ TEST(CMEOrderBookTests, LargerIncomingOrderCreatesCorrectTrade)
         CMEPrice(50000),
         CMEQuantity(100));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(restingSell));
-    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuy));
+    EXPECT_TRUE(orderBook.addOrder(restingSell));
+    EXPECT_TRUE(orderBook.addOrder(incomingBuy));
 
     ASSERT_TRUE(orderBook.getLastTrade().has_value());
 
@@ -741,8 +741,8 @@ TEST(CMEOrderBookTests, TradeIdentifiersIncreaseSequentially)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(restingSellOne));
-    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuyOne));
+    EXPECT_TRUE(orderBook.addOrder(restingSellOne));
+    EXPECT_TRUE(orderBook.addOrder(incomingBuyOne));
 
     ASSERT_TRUE(orderBook.getLastTrade().has_value());
     EXPECT_EQ(orderBook.getLastTrade()->getTradeId().value, 1);
@@ -761,8 +761,8 @@ TEST(CMEOrderBookTests, TradeIdentifiersIncreaseSequentially)
         CMEPrice(51000),
         CMEQuantity(10));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(restingSellTwo));
-    EXPECT_TRUE(orderBook.addLimitOrder(incomingBuyTwo));
+    EXPECT_TRUE(orderBook.addOrder(restingSellTwo));
+    EXPECT_TRUE(orderBook.addOrder(incomingBuyTwo));
 
     ASSERT_TRUE(orderBook.getLastTrade().has_value());
     EXPECT_EQ(orderBook.getLastTrade()->getTradeId().value, 2);
@@ -783,7 +783,7 @@ TEST(CMEOrderBookTests, CancelsBuyOrder)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(buyOrder));
+    EXPECT_TRUE(orderBook.addOrder(buyOrder));
 
     EXPECT_EQ(orderBook.getBuyLevelCount(), 1);
 
@@ -804,7 +804,7 @@ TEST(CMEOrderBookTests, CancelsSellOrder)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(sellOrder));
+    EXPECT_TRUE(orderBook.addOrder(sellOrder));
 
     EXPECT_EQ(orderBook.getSellLevelCount(), 1);
 
@@ -825,7 +825,7 @@ TEST(CMEOrderBookTests, CancellingUnknownOrderReturnsFalse)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(buyOrder));
+    EXPECT_TRUE(orderBook.addOrder(buyOrder));
 
     EXPECT_FALSE(orderBook.cancelOrder(CMEOrderId(9999)));
 
@@ -855,8 +855,8 @@ TEST(CMEOrderBookTests, CancellingOneOrderLeavesOtherOrdersAtSamePrice)
         CMEPrice(50000),
         CMEQuantity(50));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(firstOrder));
-    EXPECT_TRUE(orderBook.addLimitOrder(secondOrder));
+    EXPECT_TRUE(orderBook.addOrder(firstOrder));
+    EXPECT_TRUE(orderBook.addOrder(secondOrder));
 
     EXPECT_TRUE(orderBook.cancelOrder(CMEOrderId(1001)));
 
@@ -881,7 +881,7 @@ TEST(CMEOrderBookTests, CancellingLastOrderRemovesPriceLevel)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(sellOrder));
+    EXPECT_TRUE(orderBook.addOrder(sellOrder));
 
     EXPECT_EQ(orderBook.getSellLevelCount(), 1);
 
@@ -908,8 +908,8 @@ TEST(CMEOrderBookTests, CancellingOrderAtOnePriceDoesNotRemoveOtherPriceLevels)
         CMEPrice(49000),
         CMEQuantity(50));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(firstOrder));
-    EXPECT_TRUE(orderBook.addLimitOrder(secondOrder));
+    EXPECT_TRUE(orderBook.addOrder(firstOrder));
+    EXPECT_TRUE(orderBook.addOrder(secondOrder));
 
     EXPECT_TRUE(orderBook.cancelOrder(CMEOrderId(1001)));
 
@@ -944,7 +944,7 @@ TEST(CMEOrderBookTests, ModifiesBuyOrderPrice)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(buyOrder));
+    EXPECT_TRUE(orderBook.addOrder(buyOrder));
 
     EXPECT_TRUE(
         orderBook.modifyOrder(
@@ -975,7 +975,7 @@ TEST(CMEOrderBookTests, ModifiesSellOrderPrice)
         CMEPrice(51000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(sellOrder));
+    EXPECT_TRUE(orderBook.addOrder(sellOrder));
 
     EXPECT_TRUE(
         orderBook.modifyOrder(
@@ -1004,7 +1004,7 @@ TEST(CMEOrderBookTests, ModifiesOrderQuantity)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(buyOrder));
+    EXPECT_TRUE(orderBook.addOrder(buyOrder));
 
     EXPECT_TRUE(
         orderBook.modifyOrder(
@@ -1037,8 +1037,8 @@ TEST(CMEOrderBookTests, ModifiedOrderLosesFifoPriority)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(firstOrder));
-    EXPECT_TRUE(orderBook.addLimitOrder(secondOrder));
+    EXPECT_TRUE(orderBook.addOrder(firstOrder));
+    EXPECT_TRUE(orderBook.addOrder(secondOrder));
 
     EXPECT_TRUE(
         orderBook.modifyOrder(
@@ -1078,7 +1078,7 @@ TEST(CMEOrderBookTests, RejectsModificationWithZeroPrice)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(buyOrder));
+    EXPECT_TRUE(orderBook.addOrder(buyOrder));
 
     EXPECT_FALSE(
         orderBook.modifyOrder(
@@ -1108,7 +1108,7 @@ TEST(CMEOrderBookTests, RejectsModificationWithZeroQuantity)
         CMEPrice(51000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(sellOrder));
+    EXPECT_TRUE(orderBook.addOrder(sellOrder));
 
     EXPECT_FALSE(
         orderBook.modifyOrder(
@@ -1144,8 +1144,8 @@ TEST(CMEOrderBookTests, ModificationCanImmediatelyMatchOppositeOrder)
         CMEPrice(50000),
         CMEQuantity(25));
 
-    EXPECT_TRUE(orderBook.addLimitOrder(restingSell));
-    EXPECT_TRUE(orderBook.addLimitOrder(restingBuy));
+    EXPECT_TRUE(orderBook.addOrder(restingSell));
+    EXPECT_TRUE(orderBook.addOrder(restingBuy));
 
     EXPECT_TRUE(
         orderBook.modifyOrder(
@@ -1163,3 +1163,95 @@ TEST(CMEOrderBookTests, ModificationCanImmediatelyMatchOppositeOrder)
     EXPECT_EQ(orderBook.getLastTrade()->getTradePrice(), CMEPrice(51000));
     EXPECT_EQ(orderBook.getLastTrade()->getTradeQuantity(), CMEQuantity(25));
 }
+
+// ============================================================================
+// MARKET ORDER TESTS
+// ============================================================================
+TEST(CMEOrderBookTests, MarketBuyMatchesBestSell)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(50000),
+            CMEQuantity(25))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(2),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(0),
+            CMEQuantity(25),
+            true)));
+
+    ASSERT_TRUE(orderBook.getLastTrade().has_value());
+
+    EXPECT_EQ(orderBook.getLastTrade()->getTradePrice(), CMEPrice(50000));
+}
+
+TEST(CMEOrderBookTests, MarketSellMatchesBestBuy)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(25))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(2),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(0),
+            CMEQuantity(25),
+            true)));
+
+    ASSERT_TRUE(orderBook.getLastTrade().has_value());
+
+    EXPECT_EQ(orderBook.getLastTrade()->getTradePrice(), CMEPrice(50000));
+}
+
+TEST(CMEOrderBookTests, MarketOrderNeverCreatesPriceLevel)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    EXPECT_FALSE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(0),
+            CMEQuantity(25),
+            true)));
+
+    EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
+    EXPECT_EQ(orderBook.getSellLevelCount(), 0);
+}
+
+TEST(CMEOrderBookTests, UnfilledMarketOrderIsDiscarded)
+{
+    CMEOrderBook orderBook(CMESymbol("BTC-GBP"));
+
+    EXPECT_FALSE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(0),
+            CMEQuantity(25),
+            true)));
+
+    EXPECT_EQ(orderBook.getBuyLevelCount(), 0);
+    EXPECT_EQ(orderBook.getSellLevelCount(), 0);
+
+    EXPECT_FALSE(orderBook.getLastTrade().has_value());
+}
+

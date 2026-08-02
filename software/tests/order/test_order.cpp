@@ -131,3 +131,19 @@ TEST(CMEOrderTests, RejectsNegativeFillQuantity)
     EXPECT_FALSE(fillApplied);
     EXPECT_EQ(order.getOrderRemainingQuantity(), CMEQuantity(100));
 }
+
+// ============================================================================
+// MARKET ORDER TESTS
+// ============================================================================
+TEST(CMEOrderTests, ConstructorStoresMarketOrderFlag)
+{
+    CMEOrder order(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25),
+        true);
+
+    EXPECT_TRUE(order.isMarket());
+}
