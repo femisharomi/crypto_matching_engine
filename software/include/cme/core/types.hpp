@@ -12,6 +12,14 @@ enum class CMESide
     UNKNOWN
 };
 
+/* Represents how long an order is allowed to remain active. */
+enum class CMETimeInForce
+{
+    GTC,
+    IOC,
+    FOK
+};
+
 /* Represents a price. */
 struct CMEPrice
 {

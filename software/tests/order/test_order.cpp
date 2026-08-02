@@ -147,3 +147,77 @@ TEST(CMEOrderTests, ConstructorStoresMarketOrderFlag)
 
     EXPECT_TRUE(order.isMarket());
 }
+
+// ============================================================================
+// TIME IN FORCE TESTS
+// ============================================================================
+
+TEST(CMEOrderTests, ConstructorDefaultsTimeInForceToGoodTillCancelled)
+{
+    CMEOrder order(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    EXPECT_EQ(order.getTimeInForce(), CMETimeInForce::GTC);
+}
+
+TEST(CMEOrderTests, ConstructorStoresImmediateOrCancelTimeInForce)
+{
+    CMEOrder order(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25),
+        false,
+        CMETimeInForce::IOC);
+
+    EXPECT_EQ(order.getTimeInForce(), CMETimeInForce::IOC);
+}
+
+TEST(CMEOrderTests, ConstructorStoresFillOrKillTimeInForce)
+{
+    CMEOrder order(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25),
+        false,
+        CMETimeInForce::FOK);
+
+    EXPECT_EQ(order.getTimeInForce(), CMETimeInForce::FOK);
+}
+
+TEST(CMEOrderTests, MarketOrderCanAlsoStoreImmediateOrCancelTimeInForce)
+{
+    CMEOrder order(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::SELL,
+        CMEPrice(0),
+        CMEQuantity(50),
+        true,
+        CMETimeInForce::IOC);
+
+    EXPECT_TRUE(order.isMarket());
+    EXPECT_EQ(order.getTimeInForce(), CMETimeInForce::IOC);
+}
+
+TEST(CMEOrderTests, MarketOrderCanAlsoStoreFillOrKillTimeInForce)
+{
+    CMEOrder order(
+        CMEOrderId(1002),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(0),
+        CMEQuantity(75),
+        true,
+        CMETimeInForce::FOK);
+
+    EXPECT_TRUE(order.isMarket());
+    EXPECT_EQ(order.getTimeInForce(), CMETimeInForce::FOK);
+}
