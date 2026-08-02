@@ -50,6 +50,9 @@ public:
     /* Removes an order from the order book using its order identifier. */
     bool cancelOrder(CMEOrderId orderId);
 
+    /* Replaces an existing order using a new price and quantity. */
+    bool modifyOrder(CMEOrderId orderId, CMEPrice newPrice, CMEQuantity newQuantity);
+
 private:
     // The trading symbol represented by this order book.
     CMESymbol bookSymbol; 
@@ -83,5 +86,8 @@ private:
 
     /* Removes an empty price level from the selected side of the order book. */
     void removeEmptyLevel(CMESide side, CMEPrice price);
+
+    /* Finds and copies the order with the supplied identifier. */
+    bool findOrder(CMEOrderId orderId, CMEOrder& foundOrder) const;
 };
 #endif // CME_ORDER_BOOK_ORDER_BOOK_HPP

@@ -7,7 +7,7 @@
 
 /* Stored orders that belong to one price in first-in, first-out order. */
 class CMEPriceLevel{
-    public:
+public:
     /* Creates a price level for one specific price. */
     CMEPriceLevel(CMEPrice price);
 
@@ -35,7 +35,13 @@ class CMEPriceLevel{
     /* Removes the order with the supplied order identifier. */
     bool removeOrder(CMEOrderId orderId);
 
-    private:
+    /* Returns the order with the supplied identifier. */
+    const CMEOrder& getOrder(CMEOrderId orderId) const;
+
+    /* Returns whether an order withj the supplied identifier exists at this price level. */
+    bool containsOrder(CMEOrderId orderId) const;
+
+private:
     // The single price represented by this price level.
     CMEPrice levelPrice; 
     
