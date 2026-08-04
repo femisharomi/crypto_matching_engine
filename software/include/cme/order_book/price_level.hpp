@@ -41,6 +41,9 @@ public:
     /* Returns whether an order withj the supplied identifier exists at this price level. */
     bool containsOrder(CMEOrderId orderId) const;
 
+    /* Returns the total remaining quantity of all orders at this price level. */
+    CMEQuantity getTotalRemainingQuantity() const;
+
 private:
     // The single price represented by this price level.
     CMEPrice levelPrice; 
