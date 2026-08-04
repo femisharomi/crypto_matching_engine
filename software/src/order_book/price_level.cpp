@@ -94,3 +94,15 @@ bool CMEPriceLevel::containsOrder(CMEOrderId orderId) const
 
     return false;
 }
+
+CMEQuantity CMEPriceLevel::getTotalRemainingQuantity() const
+{
+    CMEQuantity total(0);
+
+    for (const CMEOrder& order : orders)
+    {
+        total.value += order.getOrderRemainingQuantity().value;
+    }
+
+    return total;
+}

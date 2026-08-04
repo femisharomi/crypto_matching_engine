@@ -89,5 +89,8 @@ private:
 
     /* Returns the order with the supplied identifier if it exists. */
     std::optional<CMEOrder> findOrder(CMEOrderId orderId) const;
+
+    /* Returns whether the entire order can be matched immediately. */
+    bool canFullyMatch(const CMEOrder& incomingOrder) const;
 };
 #endif // CME_ORDER_BOOK_ORDER_BOOK_HPP
