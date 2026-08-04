@@ -15,9 +15,9 @@ enum class CMESide
 /* Represents how long an order is allowed to remain active. */
 enum class CMETimeInForce
 {
-    GTC,
-    IOC,
-    FOK
+    GTC, // GTC (Good 'Til Cancelled): Remains active indefinitely until the order fills or you manually cancel it 
+    IOC, // IOC (Immediate-Or-Cancel): Requires all or part of the order to execute immediately; any unfilled portion is instantly cancelled.
+    FOK // FOK (Fill-Or-Kill): Requires the entire order to execute immediately and completely, or else the whole order is cancelled (no partial fills).
 };
 
 /* Represents a price. */

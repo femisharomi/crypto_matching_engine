@@ -26,16 +26,31 @@ bool CMEOrderBook::addOrder(CMEOrder incomingOrder)
         return false;
     }
 
+    // Attempt to match the incoming order.
     if (tryMatchOrder(incomingOrder))
+    {
+        // The order was completely filled.
+        return true;
+    }
+
+    // Market orders never rest in the order book.
+    if (incomingOrder.isMarket())
+    {
+        // Distinguish market IOC from market GTC.
+        if (incomingOrder.getTimeInForce() == CMETimeInForce::IOC)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // Discard any unfilled quantity from an IOC order.
+    if (incomingOrder.getTimeInForce() == CMETimeInForce::IOC)
     {
         return true;
     }
 
-    if(incomingOrder.isMarket() && incomingOrder.getOrderRemainingQuantity().value != 0)
-    {
-        return false;
-    }
-
+    // Unfilled GTC limit orders rest in the order book.
     CMEPrice orderPrice = incomingOrder.getOrderPrice();
 
     switch (incomingOrder.getOrderSide())
@@ -50,7 +65,7 @@ bool CMEOrderBook::addOrder(CMEOrder incomingOrder)
 
         default:
             throw std::runtime_error(
-                "Function: CMEOrderBook::addLimitOrder() - Unknown market side encountered!");
+                "Function: CMEOrderBook::addOrder() - Unknown market side encountered!");
     }
 }
 
@@ -372,3 +387,4 @@ bool CMEOrderBook::modifyOrder(CMEOrderId orderId, CMEPrice newPrice, CMEQuantit
 
     return addOrder(replacementOrder);
 }
+
