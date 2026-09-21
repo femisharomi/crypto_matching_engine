@@ -26,6 +26,7 @@ add_library(cme_core
     software/src/order_book/order_book.cpp
     software/src/trade/trade.cpp
     software/src/order/order_rejection.cpp
+    software/src/matching/matching_result.cpp
 )
 
 # Specifies where the header (.h/.hpp) files for 'cme_core' are located.
@@ -83,6 +84,7 @@ add_executable(cme_tests
     software/tests/order_book/test_order_book.cpp
     software/tests/trade/test_trade.cpp
     software/tests/order/test_order_rejection.cpp
+    software/tests/matching/test_matching_result.cpp
 )
 
 # Links the test runner to your core engine and the downloaded GoogleTest framework.
