@@ -9,13 +9,14 @@
 #include "cme/order_book/order_book.hpp"
 #include "cme/engine/engine_command.hpp"
 #include "cme/engine/engine_event.hpp"
+#include "cme/trade/trade_publisher.hpp"
 
 /* Stores and manages multiple order books. */
 class CMEMatchingEngine
 {
 public:
-    /* Creates an empty matching engine. */
-    CMEMatchingEngine();
+    /* Creates an empty matching engine using the supplied trade publisher when one is provided. */
+    CMEMatchingEngine(CMETradePublisher* publisher = nullptr);
 
     /* Processes an order using the correct order book. */
     CMEMatchingResult processOrder(CMEOrder incomingOrder); 
@@ -41,6 +42,9 @@ private:
 
     /* Returns modifiable access to the order book for the supplied symbol. */
     CMEOrderBook& getMutableOrderBook(CMESymbol symbol);
+
+    // The trade publisher supplied to order books created by this engine.
+    CMETradePublisher* tradePublisher;
 };
 
 #endif // CME_ENGINE_MATCHING_ENGINE_HPP

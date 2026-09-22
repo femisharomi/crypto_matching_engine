@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <optional>
 
 #include "cme/engine/matching_engine.hpp"
 
@@ -472,4 +473,60 @@ TEST(CMEMatchingEngineTests, UnknownModificationProducesCommandRejectedEvent)
     EXPECT_EQ(
         event.getOrderId(),
         CMEOrderId(9999));
+}
+
+// ============================================================================
+// TRADE PUBLISHER INTEGRATION TESTS
+// ============================================================================
+
+class CMEMatchingEngineTestTradePublisher : public CMETradePublisher
+{
+public:
+    CMEMatchingEngineTestTradePublisher()
+        : publishCount(0),
+          lastPublishedTrade(std::nullopt)
+    {
+    }
+
+    void publishTrade(const CMETrade& trade) override
+    {
+        publishCount++;
+        lastPublishedTrade = trade;
+    }
+
+    std::size_t publishCount;
+
+    std::optional<CMETrade> lastPublishedTrade;
+};
+
+TEST(CMEMatchingEngineTests, EnginePassesPublisherToCreatedOrderBooks)
+{
+    CMEMatchingEngineTestTradePublisher publisher;
+
+    CMEMatchingEngine engine(&publisher);
+
+    engine.processOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(50000),
+            CMEQuantity(25)));
+
+    engine.processOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(25)));
+
+    EXPECT_EQ(publisher.publishCount, 1);
+
+    ASSERT_TRUE(
+        publisher.lastPublishedTrade.has_value());
+
+    EXPECT_EQ(
+        publisher.lastPublishedTrade->getTradeQuantity(),
+        CMEQuantity(25));
 }

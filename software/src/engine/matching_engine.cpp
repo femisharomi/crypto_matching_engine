@@ -1,9 +1,10 @@
 #include "cme/engine/matching_engine.hpp"
+#include "cme/trade/trade_publisher.hpp"
 
 
-CMEMatchingEngine::CMEMatchingEngine()
+CMEMatchingEngine::CMEMatchingEngine(CMETradePublisher* publisher) : tradePublisher(publisher)
 {
-    // No work to perform
+    
 }
 
 CMEEngineEvent CMEMatchingEngine::processCommandWithEvent(const CMEEngineCommand& command)
@@ -147,14 +148,18 @@ bool CMEMatchingEngine::processCommand(
 CMEMatchingResult CMEMatchingEngine::processOrder(CMEOrder incomingOrder)
 {
     // Check whether an order book already exists for the order symbol.
-    if(!containsOrderBook(incomingOrder.getOrderSymbol()))
+    if (!containsOrderBook(incomingOrder.getOrderSymbol()))
     {
-        // Order book doesnt exist, so create one
-        orderBooks.try_emplace(incomingOrder.getOrderSymbol().value, incomingOrder.getOrderSymbol());
+        // Order book doesn't exist, so create one.
+        orderBooks.try_emplace(
+            incomingOrder.getOrderSymbol().value,
+            incomingOrder.getOrderSymbol(),
+            tradePublisher);
     }
 
     // Retrieve the correct order book.
-    return orderBooks.at(incomingOrder.getOrderSymbol().value).processOrder(incomingOrder);
+    return orderBooks.at(
+        incomingOrder.getOrderSymbol().value).processOrder(incomingOrder);
 }
 
 std::size_t CMEMatchingEngine::getOrderBookCount() const

@@ -1,9 +1,11 @@
 #include "cme/order_book/order_book.hpp"
 #include <stdexcept>
 
-CMEOrderBook::CMEOrderBook(CMESymbol symbol) : bookSymbol(symbol)
+CMEOrderBook::CMEOrderBook(CMESymbol symbol, CMETradePublisher* publisher) : 
+                           bookSymbol(symbol), tradePublisher(publisher),
+                           nextTradeId(1)
 {
-    nextTradeId = 1;
+
 }
 
 CMESymbol CMEOrderBook::getSymbol() const
@@ -361,6 +363,11 @@ void CMEOrderBook::createTrade(const CMEOrder &incomingOrder, const CMEOrder &re
                              restingOrder.getOrderSymbol(),
                              restingOrder.getOrderPrice(),
                              tradeQuantity);
+    }
+
+    if(tradePublisher != nullptr)
+    {
+        tradePublisher->publishTrade(lastTrade.value());
     }
 
     nextTradeId++;
