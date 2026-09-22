@@ -1,0 +1,35 @@
+#ifndef CME_ENGINE_MATCHING_ENGINE_HPP
+#define CME_ENGINE_MATCHING_ENGINE_HPP
+
+#include <cstddef>
+#include <map>
+
+#include "cme/core/types.hpp"
+#include "cme/matching/matching_result.hpp"
+#include "cme/order_book/order_book.hpp"
+
+/* Stores and manages multiple order books. */
+class CMEMatchingEngine
+{
+public:
+    /* Creates an empty matching engine. */
+    CMEMatchingEngine();
+
+    /* Processes an order using the correct order book. */
+    CMEMatchingResult processOrder(CMEOrder incomingOrder); 
+
+    /* Returns the number of order books currently managed by the engine. */
+    std::size_t getOrderBookCount() const;
+
+    /* Returns whether an order book exists for the supplied symbol. */
+    bool containsOrderBook(CMESymbol symbol) const;
+
+    /* Returns the order book for the supplied symbol. */
+    const CMEOrderBook& getOrderBook(CMESymbol symbol) const;
+
+private:
+    // The order books indexed by trading symbol.
+    std::map<std::string, CMEOrderBook> orderBooks;
+};
+
+#endif // CME_ENGINE_MATCHING_ENGINE_HPP
