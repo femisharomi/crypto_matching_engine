@@ -6,6 +6,63 @@ CMEMatchingEngine::CMEMatchingEngine()
     // No work to perform
 }
 
+bool CMEMatchingEngine::processCommand(const CMEEngineCommand& command)
+{
+    switch(command.getCommandType())
+    {
+        case CMEEngineCommandType::SUBMIT_ORDER:
+        {
+            if(!command.getOrder().has_value())
+            {
+                return false;
+            }
+            
+            CMEMatchingResult result = processOrder(command.getOrder().value());
+            return result.getStatus() != CMEMatchingStatus::REJECTED;
+        }
+        case CMEEngineCommandType::CANCEL_ORDER:
+        {
+            if(!command.getOrderId().has_value())
+            {
+                return false;
+            }
+
+            if(!containsOrderBook(command.getSymbol()))
+            {
+                return false;
+            }
+
+            CMEOrderBook& orderBook = getMutableOrderBook(command.getSymbol());
+
+            return orderBook.cancelOrder(command.getOrderId().value());
+        }
+        case CMEEngineCommandType::MODIFY_ORDER:
+        {
+            if (!command.getOrderId().has_value() ||
+                !command.getNewPrice().has_value() ||
+                !command.getNewQuantity().has_value())
+            {
+                return false;
+            }
+
+            if (!containsOrderBook(command.getSymbol()))
+            {
+                return false;
+            }
+
+            CMEOrderBook& orderBook = getMutableOrderBook(command.getSymbol());
+
+            return orderBook.modifyOrder(
+                command.getOrderId().value(),
+                command.getNewPrice().value(),
+                command.getNewQuantity().value());
+        }
+        default:
+            throw std::runtime_error(
+                "Function: CMEMatchingEngine::processCommand() - Unknown command type encountered!");
+    }
+}
+
 CMEMatchingResult CMEMatchingEngine::processOrder(CMEOrder incomingOrder)
 {
     // Check whether an order book already exists for the order symbol.
@@ -32,6 +89,11 @@ bool CMEMatchingEngine::containsOrderBook(CMESymbol symbol) const
 }
 
 const CMEOrderBook& CMEMatchingEngine::getOrderBook(CMESymbol symbol) const
+{
+    return orderBooks.at(symbol.value);
+}
+
+CMEOrderBook& CMEMatchingEngine::getMutableOrderBook(CMESymbol symbol)
 {
     return orderBooks.at(symbol.value);
 }
