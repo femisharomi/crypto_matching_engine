@@ -9,6 +9,7 @@
 #include "cme/order_book/price_level.hpp"
 #include "cme/order/order_validation.hpp"
 #include "cme/trade/trade.hpp"
+#include "cme/matching/matching_result.hpp"
 
 /* Stores the buy and sell price levels for one trading symbol. */
 class CMEOrderBook
@@ -53,6 +54,9 @@ public:
     /* Replaces an existing order using a new price and quantity. */
     bool modifyOrder(CMEOrderId orderId, CMEPrice newPrice, CMEQuantity newQuantity);
 
+    /* Processes an order and returns detailed information describing the result. */
+    CMEMatchingResult processOrder(CMEOrder incomingOrder);
+
 private:
     // The trading symbol represented by this order book.
     CMESymbol bookSymbol; 
@@ -92,5 +96,8 @@ private:
 
     /* Returns whether the entire order can be matched immediately. */
     bool canFullyMatch(const CMEOrder& incomingOrder) const;
+
+    /* Creates rejection information from an order validation result. */
+    CMEOrderRejection createValidationRejection(const CMEOrder& order, CMEOrderValidationResult validationResult) const;
 };
 #endif // CME_ORDER_BOOK_ORDER_BOOK_HPP
