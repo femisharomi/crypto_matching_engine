@@ -10,13 +10,14 @@
 #include "cme/order/order_validation.hpp"
 #include "cme/trade/trade.hpp"
 #include "cme/matching/matching_result.hpp"
+#include "cme/trade/trade_publisher.hpp"
 
 /* Stores the buy and sell price levels for one trading symbol. */
 class CMEOrderBook
 {
 public:
     /* Creates an empty order book for one trading symbol. */
-    explicit CMEOrderBook(CMESymbol symbol);
+    explicit CMEOrderBook(CMESymbol symbol, CMETradePublisher* publisher = nullptr);
 
     /* Returns the trading symbol represented by this order book. */
     CMESymbol getSymbol() const;
@@ -99,5 +100,8 @@ private:
 
     /* Creates rejection information from an order validation result. */
     CMEOrderRejection createValidationRejection(const CMEOrder& order, CMEOrderValidationResult validationResult) const;
+
+    // The trade publisher that receives generated trades when one is configured.
+    CMETradePublisher* tradePublisher;
 };
 #endif // CME_ORDER_BOOK_ORDER_BOOK_HPP

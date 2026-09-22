@@ -91,6 +91,7 @@ add_executable(cme_tests
     software/tests/engine/test_matching_engine.cpp
     software/tests/engine/test_engine_command.cpp
     software/tests/engine/test_engine_event.cpp
+    software/tests/trade/test_trade_publisher.cpp
 )
 
 # Links the test runner to your core engine and the downloaded GoogleTest framework.
