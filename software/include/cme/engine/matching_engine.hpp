@@ -7,6 +7,7 @@
 #include "cme/core/types.hpp"
 #include "cme/matching/matching_result.hpp"
 #include "cme/order_book/order_book.hpp"
+#include "cme/engine/engine_command.hpp"
 
 /* Stores and manages multiple order books. */
 class CMEMatchingEngine
@@ -27,9 +28,15 @@ public:
     /* Returns the order book for the supplied symbol. */
     const CMEOrderBook& getOrderBook(CMESymbol symbol) const;
 
+    /* Processes one command using the appropriate order book. */
+    bool processCommand(const CMEEngineCommand& command);
+
 private:
     // The order books indexed by trading symbol.
     std::map<std::string, CMEOrderBook> orderBooks;
+
+    /* Returns modifiable access to the order book for the supplied symbol. */
+    CMEOrderBook& getMutableOrderBook(CMESymbol symbol);
 };
 
 #endif // CME_ENGINE_MATCHING_ENGINE_HPP
