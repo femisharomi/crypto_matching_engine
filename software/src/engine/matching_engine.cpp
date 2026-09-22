@@ -6,61 +6,142 @@ CMEMatchingEngine::CMEMatchingEngine()
     // No work to perform
 }
 
-bool CMEMatchingEngine::processCommand(const CMEEngineCommand& command)
+CMEEngineEvent CMEMatchingEngine::processCommandWithEvent(const CMEEngineCommand& command)
 {
-    switch(command.getCommandType())
+    switch (command.getCommandType())
     {
         case CMEEngineCommandType::SUBMIT_ORDER:
         {
-            if(!command.getOrder().has_value())
+            if (!command.getOrder().has_value())
             {
-                return false;
+                return CMEEngineEvent(
+                    CMEEngineEventType::COMMAND_REJECTED,
+                    command.getSymbol(),
+                    CMEOrderId(0),
+                    std::nullopt);
             }
-            
-            CMEMatchingResult result = processOrder(command.getOrder().value());
-            return result.getStatus() != CMEMatchingStatus::REJECTED;
+
+            CMEOrder submittedOrder = command.getOrder().value();
+
+            CMEMatchingResult result =
+                processOrder(submittedOrder);
+
+            return CMEEngineEvent(
+                CMEEngineEventType::ORDER_PROCESSED,
+                submittedOrder.getOrderSymbol(),
+                submittedOrder.getOrderId(),
+                result);
         }
+
         case CMEEngineCommandType::CANCEL_ORDER:
         {
-            if(!command.getOrderId().has_value())
+            if (!command.getOrderId().has_value())
             {
-                return false;
+                return CMEEngineEvent(
+                    CMEEngineEventType::COMMAND_REJECTED,
+                    command.getSymbol(),
+                    CMEOrderId(0),
+                    std::nullopt);
             }
 
-            if(!containsOrderBook(command.getSymbol()))
+            CMEOrderId orderId =
+                command.getOrderId().value();
+
+            if (!containsOrderBook(command.getSymbol()))
             {
-                return false;
+                return CMEEngineEvent(
+                    CMEEngineEventType::COMMAND_REJECTED,
+                    command.getSymbol(),
+                    orderId,
+                    std::nullopt);
             }
 
-            CMEOrderBook& orderBook = getMutableOrderBook(command.getSymbol());
+            CMEOrderBook& orderBook =
+                getMutableOrderBook(command.getSymbol());
 
-            return orderBook.cancelOrder(command.getOrderId().value());
+            bool cancellationSucceeded =
+                orderBook.cancelOrder(orderId);
+
+            if (cancellationSucceeded)
+            {
+                return CMEEngineEvent(
+                    CMEEngineEventType::ORDER_CANCELLED,
+                    command.getSymbol(),
+                    orderId,
+                    std::nullopt);
+            }
+
+            return CMEEngineEvent(
+                CMEEngineEventType::COMMAND_REJECTED,
+                command.getSymbol(),
+                orderId,
+                std::nullopt);
         }
+
         case CMEEngineCommandType::MODIFY_ORDER:
         {
             if (!command.getOrderId().has_value() ||
                 !command.getNewPrice().has_value() ||
                 !command.getNewQuantity().has_value())
             {
-                return false;
+                return CMEEngineEvent(
+                    CMEEngineEventType::COMMAND_REJECTED,
+                    command.getSymbol(),
+                    CMEOrderId(0),
+                    std::nullopt);
             }
+
+            CMEOrderId orderId =
+                command.getOrderId().value();
 
             if (!containsOrderBook(command.getSymbol()))
             {
-                return false;
+                return CMEEngineEvent(
+                    CMEEngineEventType::COMMAND_REJECTED,
+                    command.getSymbol(),
+                    orderId,
+                    std::nullopt);
             }
 
-            CMEOrderBook& orderBook = getMutableOrderBook(command.getSymbol());
+            CMEOrderBook& orderBook =
+                getMutableOrderBook(command.getSymbol());
 
-            return orderBook.modifyOrder(
-                command.getOrderId().value(),
-                command.getNewPrice().value(),
-                command.getNewQuantity().value());
+            bool modificationSucceeded =
+                orderBook.modifyOrder(
+                    orderId,
+                    command.getNewPrice().value(),
+                    command.getNewQuantity().value());
+
+            if (modificationSucceeded)
+            {
+                return CMEEngineEvent(
+                    CMEEngineEventType::ORDER_MODIFIED,
+                    command.getSymbol(),
+                    orderId,
+                    std::nullopt);
+            }
+
+            return CMEEngineEvent(
+                CMEEngineEventType::COMMAND_REJECTED,
+                command.getSymbol(),
+                orderId,
+                std::nullopt);
         }
+
         default:
             throw std::runtime_error(
-                "Function: CMEMatchingEngine::processCommand() - Unknown command type encountered!");
+                "Function: CMEMatchingEngine::processCommandWithEvent() - Unknown command type encountered!");
     }
+}
+
+bool CMEMatchingEngine::processCommand(
+    const CMEEngineCommand& command)
+{
+    CMEEngineEvent event =
+        processCommandWithEvent(command);
+
+    return event.getEventType() !=
+           CMEEngineEventType::COMMAND_REJECTED;
 }
 
 CMEMatchingResult CMEMatchingEngine::processOrder(CMEOrder incomingOrder)

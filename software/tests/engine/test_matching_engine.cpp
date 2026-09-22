@@ -279,3 +279,197 @@ TEST(CMEMatchingEngineTests, CommandsForDifferentSymbolsRemainSeparated)
         ethBook.getBestBid(),
         CMEPrice(3000));
 }
+
+// ============================================================================
+// ENGINE EVENT PROCESSING TESTS
+// ============================================================================
+
+TEST(CMEMatchingEngineTests, SubmitCommandProducesOrderProcessedEvent)
+{
+    CMEMatchingEngine engine;
+
+    CMEOrder order(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    CMEEngineCommand command(order);
+
+    CMEEngineEvent event =
+        engine.processCommandWithEvent(command);
+
+    EXPECT_EQ(
+        event.getEventType(),
+        CMEEngineEventType::ORDER_PROCESSED);
+
+    EXPECT_EQ(
+        event.getOrderId(),
+        CMEOrderId(1001));
+
+    ASSERT_TRUE(event.hasMatchingResult());
+
+    EXPECT_EQ(
+        event.getMatchingResult()->getStatus(),
+        CMEMatchingStatus::RESTING);
+}
+
+TEST(CMEMatchingEngineTests, InvalidSubmittedOrderProducesRejectedMatchingResult)
+{
+    CMEMatchingEngine engine;
+
+    CMEOrder order(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(0),
+        CMEQuantity(25));
+
+    CMEEngineEvent event =
+        engine.processCommandWithEvent(
+            CMEEngineCommand(order));
+
+    EXPECT_EQ(
+        event.getEventType(),
+        CMEEngineEventType::ORDER_PROCESSED);
+
+    ASSERT_TRUE(event.hasMatchingResult());
+
+    EXPECT_EQ(
+        event.getMatchingResult()->getStatus(),
+        CMEMatchingStatus::REJECTED);
+
+    ASSERT_TRUE(
+        event.getMatchingResult()
+            ->getRejection()
+            .has_value());
+
+    EXPECT_EQ(
+        event.getMatchingResult()
+            ->getRejection()
+            ->getReason(),
+        CMEOrderRejectionReason::INVALID_PRICE);
+}
+
+TEST(CMEMatchingEngineTests, CancelCommandProducesOrderCancelledEvent)
+{
+    CMEMatchingEngine engine;
+
+    CMEOrder order(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(
+        engine.processCommand(
+            CMEEngineCommand(order)));
+
+    CMEEngineCommand cancelCommand =
+        CMEEngineCommand::createCancelCommand(
+            CMESymbol("BTC-GBP"),
+            CMEOrderId(1001));
+
+    CMEEngineEvent event =
+        engine.processCommandWithEvent(cancelCommand);
+
+    EXPECT_EQ(
+        event.getEventType(),
+        CMEEngineEventType::ORDER_CANCELLED);
+
+    EXPECT_EQ(
+        event.getOrderId(),
+        CMEOrderId(1001));
+
+    EXPECT_FALSE(event.hasMatchingResult());
+}
+
+TEST(CMEMatchingEngineTests, UnknownCancellationProducesCommandRejectedEvent)
+{
+    CMEMatchingEngine engine;
+
+    CMEEngineCommand command =
+        CMEEngineCommand::createCancelCommand(
+            CMESymbol("BTC-GBP"),
+            CMEOrderId(9999));
+
+    CMEEngineEvent event =
+        engine.processCommandWithEvent(command);
+
+    EXPECT_EQ(
+        event.getEventType(),
+        CMEEngineEventType::COMMAND_REJECTED);
+
+    EXPECT_EQ(
+        event.getOrderId(),
+        CMEOrderId(9999));
+
+    EXPECT_FALSE(event.hasMatchingResult());
+}
+
+TEST(CMEMatchingEngineTests, ModifyCommandProducesOrderModifiedEvent)
+{
+    CMEMatchingEngine engine;
+
+    CMEOrder order(
+        CMEOrderId(1001),
+        CMESymbol("BTC-GBP"),
+        CMESide::BUY,
+        CMEPrice(50000),
+        CMEQuantity(25));
+
+    EXPECT_TRUE(
+        engine.processCommand(
+            CMEEngineCommand(order)));
+
+    CMEEngineCommand modifyCommand =
+        CMEEngineCommand::createModifyCommand(
+            CMESymbol("BTC-GBP"),
+            CMEOrderId(1001),
+            CMEPrice(51000),
+            CMEQuantity(50));
+
+    CMEEngineEvent event =
+        engine.processCommandWithEvent(modifyCommand);
+
+    EXPECT_EQ(
+        event.getEventType(),
+        CMEEngineEventType::ORDER_MODIFIED);
+
+    EXPECT_EQ(
+        event.getOrderId(),
+        CMEOrderId(1001));
+
+    const CMEOrderBook& orderBook =
+        engine.getOrderBook(
+            CMESymbol("BTC-GBP"));
+
+    EXPECT_EQ(
+        orderBook.getBestBid(),
+        CMEPrice(51000));
+}
+
+TEST(CMEMatchingEngineTests, UnknownModificationProducesCommandRejectedEvent)
+{
+    CMEMatchingEngine engine;
+
+    CMEEngineCommand modifyCommand =
+        CMEEngineCommand::createModifyCommand(
+            CMESymbol("BTC-GBP"),
+            CMEOrderId(9999),
+            CMEPrice(51000),
+            CMEQuantity(50));
+
+    CMEEngineEvent event =
+        engine.processCommandWithEvent(modifyCommand);
+
+    EXPECT_EQ(
+        event.getEventType(),
+        CMEEngineEventType::COMMAND_REJECTED);
+
+    EXPECT_EQ(
+        event.getOrderId(),
+        CMEOrderId(9999));
+}

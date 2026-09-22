@@ -8,6 +8,7 @@
 #include "cme/matching/matching_result.hpp"
 #include "cme/order_book/order_book.hpp"
 #include "cme/engine/engine_command.hpp"
+#include "cme/engine/engine_event.hpp"
 
 /* Stores and manages multiple order books. */
 class CMEMatchingEngine
@@ -30,6 +31,9 @@ public:
 
     /* Processes one command using the appropriate order book. */
     bool processCommand(const CMEEngineCommand& command);
+
+    /* Processes one command and returns an event describing the result. */
+    CMEEngineEvent processCommandWithEvent(const CMEEngineCommand& command);
 
 private:
     // The order books indexed by trading symbol.
