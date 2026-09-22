@@ -15,7 +15,7 @@ enum class CMEOrderRejectionReason
     INVALID_QUANTITY,
     WRONG_SYMBOL,
     FILL_OR_KILL_NOT_POSSIBLE,
-    UNKOWN
+    UNKNOWN
 };
 
 /* Stores the details describing why an order was rejected. */

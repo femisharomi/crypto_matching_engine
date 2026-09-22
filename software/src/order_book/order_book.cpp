@@ -13,66 +13,26 @@ CMESymbol CMEOrderBook::getSymbol() const
 
 bool CMEOrderBook::addOrder(CMEOrder incomingOrder)
 {
-    CMEOrderValidationResult validationResult =
-        orderValidator.validateOrder(incomingOrder);
+    bool isMarketOrder = incomingOrder.isMarket();
+    CMETimeInForce timeInForce = incomingOrder.getTimeInForce();
 
-    if (validationResult != CMEOrderValidationResult::VALID)
+    CMEMatchingResult result = processOrder(incomingOrder);
+
+    if (result.getStatus() == CMEMatchingStatus::REJECTED)
     {
         return false;
     }
 
-    if (incomingOrder.getOrderSymbol() != bookSymbol)
+    // Preserve the existing behaviour of ordinary market orders:
+    // if any quantity remains and is cancelled, addOrder returns false.
+    if (result.getStatus() == CMEMatchingStatus::CANCELLED &&
+        isMarketOrder &&
+        timeInForce != CMETimeInForce::IOC)
     {
         return false;
     }
 
-    if (incomingOrder.getTimeInForce() == CMETimeInForce::FOK)
-    {
-        if (!canFullyMatch(incomingOrder))
-            return false;
-    }
-
-    // Attempt to match the incoming order.
-    if (tryMatchOrder(incomingOrder))
-    {
-        // The order was completely filled.
-        return true;
-    }
-
-    // Market orders never rest in the order book.
-    if (incomingOrder.isMarket())
-    {
-        // Distinguish market IOC from market GTC.
-        if (incomingOrder.getTimeInForce() == CMETimeInForce::IOC)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    // Discard any unfilled quantity from an IOC order.
-    if (incomingOrder.getTimeInForce() == CMETimeInForce::IOC)
-    {
-        return true;
-    }
-
-    // Unfilled GTC limit orders rest in the order book.
-    CMEPrice orderPrice = incomingOrder.getOrderPrice();
-
-    switch (incomingOrder.getOrderSide())
-    {
-    case CMESide::BUY:
-        buyLevels.try_emplace(orderPrice.value, orderPrice);
-        return buyLevels.at(orderPrice.value).addOrder(incomingOrder);
-
-    case CMESide::SELL:
-        sellLevels.try_emplace(orderPrice.value, orderPrice);
-        return sellLevels.at(orderPrice.value).addOrder(incomingOrder);
-
-    default:
-        throw std::runtime_error(
-            "Function: CMEOrderBook::addOrder() - Unknown market side encountered!");
-    }
+    return true;
 }
 
 bool CMEOrderBook::canMatch(const CMEOrder &incomingOrder) const
@@ -491,4 +451,193 @@ bool CMEOrderBook::modifyOrder(CMEOrderId orderId, CMEPrice newPrice, CMEQuantit
         return false;
 
     return addOrder(replacementOrder);
+}
+
+CMEMatchingResult CMEOrderBook::processOrder(CMEOrder incomingOrder)
+{
+    std::uint64_t startingTradeId = nextTradeId;
+
+    CMEOrderValidationResult validationResult =
+        orderValidator.validateOrder(incomingOrder);
+
+    // Reject invalid orders.
+    if (validationResult != CMEOrderValidationResult::VALID)
+    {
+        CMEOrderRejection rejection =
+            createValidationRejection(incomingOrder, validationResult);
+
+        return CMEMatchingResult(
+            incomingOrder.getOrderId(),
+            CMEMatchingStatus::REJECTED,
+            std::nullopt,
+            rejection);
+    }
+
+    // Reject orders intended for a different order book.
+    if (incomingOrder.getOrderSymbol() != bookSymbol)
+    {
+        CMEOrderRejection rejection(
+            incomingOrder.getOrderId(),
+            CMEOrderRejectionReason::WRONG_SYMBOL,
+            "Order symbol does not match this order book.");
+
+        return CMEMatchingResult(
+            incomingOrder.getOrderId(),
+            CMEMatchingStatus::REJECTED,
+            std::nullopt,
+            rejection);
+    }
+
+    // FOK orders must be completely matchable before any matching occurs.
+    if (incomingOrder.getTimeInForce() == CMETimeInForce::FOK)
+    {
+        if (!canFullyMatch(incomingOrder))
+        {
+            CMEOrderRejection rejection(
+                incomingOrder.getOrderId(),
+                CMEOrderRejectionReason::FILL_OR_KILL_NOT_POSSIBLE,
+                "Fill or kill order cannot be completely matched.");
+
+            return CMEMatchingResult(
+                incomingOrder.getOrderId(),
+                CMEMatchingStatus::REJECTED,
+                std::nullopt,
+                rejection);
+        }
+    }
+
+    // Attempt to match the order.
+    bool completelyFilled = tryMatchOrder(incomingOrder);
+
+    // Check whether this specific order generated at least one trade.
+    bool tradeGenerated = nextTradeId > startingTradeId;
+
+    if (completelyFilled)
+    {
+        if (tradeGenerated)
+        {
+            return CMEMatchingResult(
+                incomingOrder.getOrderId(),
+                CMEMatchingStatus::FILLED,
+                lastTrade,
+                std::nullopt);
+        }
+
+        return CMEMatchingResult(
+            incomingOrder.getOrderId(),
+            CMEMatchingStatus::FILLED,
+            std::nullopt,
+            std::nullopt);
+    }
+
+    // Market orders never rest in the order book.
+    if (incomingOrder.isMarket())
+    {
+        if (tradeGenerated)
+        {
+            return CMEMatchingResult(
+                incomingOrder.getOrderId(),
+                CMEMatchingStatus::CANCELLED,
+                lastTrade,
+                std::nullopt);
+        }
+
+        return CMEMatchingResult(
+            incomingOrder.getOrderId(),
+            CMEMatchingStatus::CANCELLED,
+            std::nullopt,
+            std::nullopt);
+    }
+
+    // IOC orders cancel any quantity that remains after matching.
+    if (incomingOrder.getTimeInForce() == CMETimeInForce::IOC)
+    {
+        if (tradeGenerated)
+        {
+            return CMEMatchingResult(
+                incomingOrder.getOrderId(),
+                CMEMatchingStatus::CANCELLED,
+                lastTrade,
+                std::nullopt);
+        }
+
+        return CMEMatchingResult(
+            incomingOrder.getOrderId(),
+            CMEMatchingStatus::CANCELLED,
+            std::nullopt,
+            std::nullopt);
+    }
+
+    // Any remaining GTC limit quantity rests in the order book.
+    CMEPrice orderPrice = incomingOrder.getOrderPrice();
+    bool orderAdded = false;
+
+    switch (incomingOrder.getOrderSide())
+    {
+        case CMESide::BUY:
+            buyLevels.try_emplace(orderPrice.value, orderPrice);
+            orderAdded =
+                buyLevels.at(orderPrice.value).addOrder(incomingOrder);
+            break;
+
+        case CMESide::SELL:
+            sellLevels.try_emplace(orderPrice.value, orderPrice);
+            orderAdded =
+                sellLevels.at(orderPrice.value).addOrder(incomingOrder);
+            break;
+
+        default:
+            throw std::runtime_error(
+                "Function: CMEOrderBook::processOrder() - Unknown market side encountered!");
+    }
+
+    if (!orderAdded)
+    {
+        CMEOrderRejection rejection(
+            incomingOrder.getOrderId(),
+            CMEOrderRejectionReason::UNKNOWN,
+            "Order could not be added to the order book.");
+
+        return CMEMatchingResult(
+            incomingOrder.getOrderId(),
+            CMEMatchingStatus::REJECTED,
+            std::nullopt,
+            rejection);
+    }
+
+    // The order traded but still has remaining quantity resting.
+    if (tradeGenerated)
+    {
+        return CMEMatchingResult(
+            incomingOrder.getOrderId(),
+            CMEMatchingStatus::PARTIALLY_FILLED,
+            lastTrade,
+            std::nullopt);
+    }
+
+    // Nothing matched, so the entire order is resting.
+    return CMEMatchingResult(
+        incomingOrder.getOrderId(),
+        CMEMatchingStatus::RESTING,
+        std::nullopt,
+        std::nullopt);
+}
+
+CMEOrderRejection CMEOrderBook::createValidationRejection(const CMEOrder& order, CMEOrderValidationResult validationResult) const
+{
+    switch(validationResult)
+    {
+        case CMEOrderValidationResult::VALID:
+            return CMEOrderRejection(order.getOrderId(), CMEOrderRejectionReason::NONE, "Valid Order.");
+        case CMEOrderValidationResult::INVALID_ORDER_ID:
+            return CMEOrderRejection(order.getOrderId(), CMEOrderRejectionReason::INVALID_ORDER_ID, "Order identifier must be greater than zero.");
+        case CMEOrderValidationResult::EMPTY_SYMBOL:
+            return CMEOrderRejection(order.getOrderId(), CMEOrderRejectionReason::EMPTY_SYMBOL, "Order symbol must not be empty.");       
+        case CMEOrderValidationResult::INVALID_PRICE:
+            return CMEOrderRejection(order.getOrderId(), CMEOrderRejectionReason::INVALID_PRICE, "Order price must be greater than zero.");         
+        case CMEOrderValidationResult::INVALID_QUANTITY:
+            return CMEOrderRejection(order.getOrderId(), CMEOrderRejectionReason::INVALID_QUANTITY, "Order quantity must be greater than zero.");      
+        default: 
+            return CMEOrderRejection(order.getOrderId(), CMEOrderRejectionReason::UNKNOWN, "Unknown order validation failure.");
+    }
 }
