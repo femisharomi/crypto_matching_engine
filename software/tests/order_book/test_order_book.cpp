@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "cme/order_book/order_book.hpp"
+#include "cme/trade/in_memory_trade_publisher.hpp"
 
 // ============================================================================
 // CME ORDER BOOK TEST SUITE
@@ -1774,4 +1775,118 @@ TEST(CMEOrderBookTests, ProcessOrderDoesNotReturnPreviousTradeForUnmatchedOrder)
     EXPECT_EQ(result.getStatus(), CMEMatchingStatus::RESTING);
     EXPECT_FALSE(result.hasTrade());
     EXPECT_FALSE(result.hasRejection());
+}
+
+// ============================================================================
+// IN MEMORY TRADE PUBLISHER INTEGRATION TESTS
+// ============================================================================
+
+TEST(CMEOrderBookTests, MultipleMatchesAreStoredByInMemoryTradePublisher)
+{
+    CMEInMemoryTradePublisher publisher;
+
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"),
+        &publisher);
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(50000),
+            CMEQuantity(25))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(25))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1003),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(51000),
+            CMEQuantity(10))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1004),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(51000),
+            CMEQuantity(10))));
+
+    ASSERT_EQ(publisher.getTradeCount(), 2);
+
+    EXPECT_EQ(
+        publisher.getTrade(0).getTradeId().value,
+        std::uint64_t(1));
+
+    EXPECT_EQ(
+        publisher.getTrade(0).getTradeQuantity(),
+        CMEQuantity(25));
+
+    EXPECT_EQ(
+        publisher.getTrade(1).getTradeId().value,
+        std::uint64_t(2));
+
+    EXPECT_EQ(
+        publisher.getTrade(1).getTradeQuantity(),
+        CMEQuantity(10));
+}
+
+TEST(CMEOrderBookTests, MultiFillOrderPublishesEveryGeneratedTrade)
+{
+    CMEInMemoryTradePublisher publisher;
+
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"),
+        &publisher);
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(50000),
+            CMEQuantity(20))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(50000),
+            CMEQuantity(30))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1003),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(50))));
+
+    ASSERT_EQ(publisher.getTradeCount(), 2);
+
+    EXPECT_EQ(
+        publisher.getTrade(0).getSellOrderId(),
+        CMEOrderId(1001));
+
+    EXPECT_EQ(
+        publisher.getTrade(0).getTradeQuantity(),
+        CMEQuantity(20));
+
+    EXPECT_EQ(
+        publisher.getTrade(1).getSellOrderId(),
+        CMEOrderId(1002));
+
+    EXPECT_EQ(
+        publisher.getTrade(1).getTradeQuantity(),
+        CMEQuantity(30));
 }
