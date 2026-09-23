@@ -11,6 +11,7 @@
 #include "cme/trade/trade.hpp"
 #include "cme/matching/matching_result.hpp"
 #include "cme/trade/trade_publisher.hpp"
+#include "cme/market_data/market_data_snapshot.hpp"
 
 /* Stores the buy and sell price levels for one trading symbol. */
 class CMEOrderBook
@@ -57,6 +58,9 @@ public:
 
     /* Processes an order and returns detailed information describing the result. */
     CMEMatchingResult processOrder(CMEOrder incomingOrder);
+
+    /* Returns a snapshot describing the current state of this order book. */
+    CMEMarketDataSnapshot getMarketDataSnapshot() const;
 
 private:
     // The trading symbol represented by this order book.

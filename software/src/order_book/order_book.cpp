@@ -648,3 +648,21 @@ CMEOrderRejection CMEOrderBook::createValidationRejection(const CMEOrder& order,
             return CMEOrderRejection(order.getOrderId(), CMEOrderRejectionReason::UNKNOWN, "Unknown order validation failure.");
     }
 }
+
+CMEMarketDataSnapshot CMEOrderBook::getMarketDataSnapshot() const
+{
+    std::optional<CMEPrice> snapshotBestBid = std::nullopt;
+    std::optional<CMEPrice> snapshotBestAsk = std::nullopt;
+
+    if(hasBuyLevels())
+    {
+        snapshotBestBid = getBestBid();
+    }
+
+    if(hasSellLevels())
+    {
+        snapshotBestAsk = getBestAsk();
+    }
+
+    return CMEMarketDataSnapshot(bookSymbol, snapshotBestBid, snapshotBestAsk, buyLevels.size(), sellLevels.size());
+}
