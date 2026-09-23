@@ -31,6 +31,7 @@ add_library(cme_core
     software/src/engine/engine_command.cpp
     software/src/engine/engine_event.cpp
     software/src/trade/in_memory_trade_publisher.cpp
+    software/src/market_data/market_data_snapshot.cpp
 )
 
 # Specifies where the header (.h/.hpp) files for 'cme_core' are located.
@@ -94,6 +95,7 @@ add_executable(cme_tests
     software/tests/engine/test_engine_event.cpp
     software/tests/trade/test_trade_publisher.cpp
     software/tests/trade/test_in_memory_trade_publisher.cpp
+    software/tests/market_data/test_market_data_snapshot.cpp
 )
 
 # Links the test runner to your core engine and the downloaded GoogleTest framework.

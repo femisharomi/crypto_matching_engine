@@ -1890,3 +1890,176 @@ TEST(CMEOrderBookTests, MultiFillOrderPublishesEveryGeneratedTrade)
         publisher.getTrade(1).getTradeQuantity(),
         CMEQuantity(30));
 }
+
+// ============================================================================
+// MARKET DATA SNAPSHOT TESTS
+// ============================================================================
+
+TEST(CMEOrderBookTests, EmptyOrderBookProducesEmptyMarketDataSnapshot)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    CMEMarketDataSnapshot snapshot =
+        orderBook.getMarketDataSnapshot();
+
+    EXPECT_EQ(
+        snapshot.getSymbol(),
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_FALSE(
+        snapshot.getBestBid().has_value());
+
+    EXPECT_FALSE(
+        snapshot.getBestAsk().has_value());
+
+    EXPECT_EQ(
+        snapshot.getBuyLevelCount(),
+        0);
+
+    EXPECT_EQ(
+        snapshot.getSellLevelCount(),
+        0);
+}
+
+TEST(CMEOrderBookTests, MarketDataSnapshotContainsBestBidAndAsk)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(49000),
+            CMEQuantity(10))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(20))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1003),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(51000),
+            CMEQuantity(15))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1004),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(52000),
+            CMEQuantity(25))));
+
+    CMEMarketDataSnapshot snapshot =
+        orderBook.getMarketDataSnapshot();
+
+    ASSERT_TRUE(
+        snapshot.getBestBid().has_value());
+
+    ASSERT_TRUE(
+        snapshot.getBestAsk().has_value());
+
+    EXPECT_EQ(
+        snapshot.getBestBid().value(),
+        CMEPrice(50000));
+
+    EXPECT_EQ(
+        snapshot.getBestAsk().value(),
+        CMEPrice(51000));
+
+    EXPECT_EQ(
+        snapshot.getBuyLevelCount(),
+        2);
+
+    EXPECT_EQ(
+        snapshot.getSellLevelCount(),
+        2);
+}
+
+TEST(CMEOrderBookTests, MarketDataSnapshotChangesAfterCancellation)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(10))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(49000),
+            CMEQuantity(20))));
+
+    EXPECT_TRUE(
+        orderBook.cancelOrder(
+            CMEOrderId(1001)));
+
+    CMEMarketDataSnapshot snapshot =
+        orderBook.getMarketDataSnapshot();
+
+    ASSERT_TRUE(
+        snapshot.getBestBid().has_value());
+
+    EXPECT_EQ(
+        snapshot.getBestBid().value(),
+        CMEPrice(49000));
+
+    EXPECT_EQ(
+        snapshot.getBuyLevelCount(),
+        1);
+}
+
+TEST(CMEOrderBookTests, MarketDataSnapshotChangesAfterMatch)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(50000),
+            CMEQuantity(25))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(25))));
+
+    CMEMarketDataSnapshot snapshot =
+        orderBook.getMarketDataSnapshot();
+
+    EXPECT_FALSE(
+        snapshot.getBestBid().has_value());
+
+    EXPECT_FALSE(
+        snapshot.getBestAsk().has_value());
+
+    EXPECT_EQ(
+        snapshot.getBuyLevelCount(),
+        0);
+
+    EXPECT_EQ(
+        snapshot.getSellLevelCount(),
+        0);
+}
