@@ -1,10 +1,10 @@
 #include "cme/market_data/market_data_snapshot.hpp"
 
-CMEMarketDataSnapshot::CMEMarketDataSnapshot(CMESymbol snapshotSymbol, std::optional<CMEPrice> snapshotBestBid, 
-                    std::optional<CMEPrice> snapshotBestAsk, std::size_t snapshotBuyLevelCount,
+CMEMarketDataSnapshot::CMEMarketDataSnapshot(CMESymbol snapshotSymbol, std::optional<CMEPrice> snapshotBestBid, std::optional<CMEQuantity> snapshotBestBidQuantity,
+                    std::optional<CMEPrice> snapshotBestAsk, std::optional<CMEQuantity> snapshotBestAskQuantity, std::size_t snapshotBuyLevelCount,
                     std::size_t snapshotSellLevelCount) : 
-                    symbol(snapshotSymbol), bestBid(snapshotBestBid), 
-                    bestAsk(snapshotBestAsk), buyLevelCount(snapshotBuyLevelCount), 
+                    symbol(snapshotSymbol), bestBid(snapshotBestBid), bestBidQuantity(snapshotBestBidQuantity),
+                    bestAsk(snapshotBestAsk), bestAskQuantity(snapshotBestAskQuantity),buyLevelCount(snapshotBuyLevelCount), 
                     sellLevelCount(snapshotSellLevelCount)
 {
     
@@ -33,4 +33,14 @@ std::size_t CMEMarketDataSnapshot::getBuyLevelCount() const
 std::size_t CMEMarketDataSnapshot::getSellLevelCount() const
 {
     return sellLevelCount;
+}
+
+const std::optional<CMEQuantity>& CMEMarketDataSnapshot::getBestBidQuantity() const
+{
+    return bestBidQuantity;
+}
+
+const std::optional<CMEQuantity>& CMEMarketDataSnapshot::getBestAskQuantity() const
+{
+    return bestAskQuantity;
 }

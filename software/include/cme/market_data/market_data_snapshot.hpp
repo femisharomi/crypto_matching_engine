@@ -11,9 +11,9 @@ class CMEMarketDataSnapshot
 {
 public:
     /* Creates a market data snapshot from the supplied order book state. */
-    CMEMarketDataSnapshot(CMESymbol snapshotSymbol, std::optional<CMEPrice> snapshotBestBid, 
-                        std::optional<CMEPrice> snapshotBestAsk, std::size_t snapshotBuyLevelCount,
-                        std::size_t snapshotSellLevelCount);
+    CMEMarketDataSnapshot(CMESymbol snapshotSymbol, std::optional<CMEPrice> snapshotBestBid, std::optional<CMEQuantity> snapshotBestBidQuantity, 
+                        std::optional<CMEPrice> snapshotBestAsk, std::optional<CMEQuantity> snapshotBestAskQuantity, 
+                        std::size_t snapshotBuyLevelCount, std::size_t snapshotSellLevelCount);
 
     /* Returns the trading symbol represented by this snapshot. */
     CMESymbol getSymbol() const;
@@ -30,6 +30,12 @@ public:
     /* Returns the number of sell price levels in this snapshot. */
     std::size_t getSellLevelCount() const;
 
+    /* Returns the total remaining quantity available at the best bid when one exists. */
+    const std::optional<CMEQuantity>& getBestBidQuantity() const;
+
+    /* Returns the total remaining quantity available at the best ask when one exists. */
+    const std::optional<CMEQuantity>& getBestAskQuantity() const;
+
 private:
     // The trading symbol represented by this snapshot.
     CMESymbol symbol; 
@@ -45,6 +51,12 @@ private:
 
     // The number of sell price levels represented by this snapshot.
     std::size_t sellLevelCount;
+
+    // The total remaining quantity available at the best bid, when one exists.
+    std::optional<CMEQuantity> bestBidQuantity;
+
+    // The total remaining quantity available at the best ask, when one exists.
+    std::optional<CMEQuantity> bestAskQuantity;
 };
 
 #endif // CME_MARKET_DATA_MARKET_DATA_SNAPSHOT_HPP

@@ -652,17 +652,36 @@ CMEOrderRejection CMEOrderBook::createValidationRejection(const CMEOrder& order,
 CMEMarketDataSnapshot CMEOrderBook::getMarketDataSnapshot() const
 {
     std::optional<CMEPrice> snapshotBestBid = std::nullopt;
+    std::optional<CMEQuantity> snapshotBestBidQuantity = std::nullopt;
     std::optional<CMEPrice> snapshotBestAsk = std::nullopt;
+    std::optional<CMEQuantity> snapshotBestAskQuantity = std::nullopt;
 
-    if(hasBuyLevels())
+    if (hasBuyLevels())
     {
-        snapshotBestBid = getBestBid();
+        CMEPrice bestBid = getBestBid();
+        const CMEPriceLevel& bestBidLevel = getBuyLevel(bestBid);
+
+        snapshotBestBid = bestBid;
+        snapshotBestBidQuantity =
+            bestBidLevel.getTotalRemainingQuantity();
     }
 
-    if(hasSellLevels())
+    if (hasSellLevels())
     {
-        snapshotBestAsk = getBestAsk();
+        CMEPrice bestAsk = getBestAsk();
+        const CMEPriceLevel& bestAskLevel = getSellLevel(bestAsk);
+
+        snapshotBestAsk = bestAsk;
+        snapshotBestAskQuantity =
+            bestAskLevel.getTotalRemainingQuantity();
     }
 
-    return CMEMarketDataSnapshot(bookSymbol, snapshotBestBid, snapshotBestAsk, buyLevels.size(), sellLevels.size());
+    return CMEMarketDataSnapshot(
+        bookSymbol,
+        snapshotBestBid,
+        snapshotBestBidQuantity,
+        snapshotBestAsk,
+        snapshotBestAskQuantity,
+        buyLevels.size(),
+        sellLevels.size());
 }

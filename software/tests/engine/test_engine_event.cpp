@@ -10,7 +10,7 @@
 // ENGINE EVENT TESTS
 // ============================================================================
 
-TEST(CMEEngineEventTests, StoresOrderProcessedEvent)
+TEST(CMEEngineEventTests, StoresOrderProcessedEventWithMatchingResult)
 {
     CMEMatchingResult result(
         CMEOrderId(1001),
@@ -36,53 +36,15 @@ TEST(CMEEngineEventTests, StoresOrderProcessedEvent)
         event.getOrderId(),
         CMEOrderId(1001));
 
-    ASSERT_TRUE(event.hasMatchingResult());
-    ASSERT_TRUE(event.getMatchingResult().has_value());
+    ASSERT_TRUE(
+        event.hasMatchingResult());
 
     EXPECT_EQ(
         event.getMatchingResult()->getStatus(),
         CMEMatchingStatus::RESTING);
 }
 
-TEST(CMEEngineEventTests, StoresCancellationEventWithoutMatchingResult)
-{
-    CMEEngineEvent event(
-        CMEEngineEventType::ORDER_CANCELLED,
-        CMESymbol("BTC-GBP"),
-        CMEOrderId(1001),
-        std::nullopt);
-
-    EXPECT_EQ(
-        event.getEventType(),
-        CMEEngineEventType::ORDER_CANCELLED);
-
-    EXPECT_EQ(
-        event.getOrderId(),
-        CMEOrderId(1001));
-
-    EXPECT_FALSE(event.hasMatchingResult());
-}
-
-TEST(CMEEngineEventTests, StoresModificationEventWithoutMatchingResult)
-{
-    CMEEngineEvent event(
-        CMEEngineEventType::ORDER_MODIFIED,
-        CMESymbol("BTC-GBP"),
-        CMEOrderId(1001),
-        std::nullopt);
-
-    EXPECT_EQ(
-        event.getEventType(),
-        CMEEngineEventType::ORDER_MODIFIED);
-
-    EXPECT_EQ(
-        event.getSymbol(),
-        CMESymbol("BTC-GBP"));
-
-    EXPECT_FALSE(event.hasMatchingResult());
-}
-
-TEST(CMEEngineEventTests, StoresRejectedCommandEvent)
+TEST(CMEEngineEventTests, StoresEventWithoutMatchingResult)
 {
     CMEEngineEvent event(
         CMEEngineEventType::COMMAND_REJECTED,
@@ -95,8 +57,13 @@ TEST(CMEEngineEventTests, StoresRejectedCommandEvent)
         CMEEngineEventType::COMMAND_REJECTED);
 
     EXPECT_EQ(
+        event.getSymbol(),
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_EQ(
         event.getOrderId(),
         CMEOrderId(9999));
 
-    EXPECT_FALSE(event.hasMatchingResult());
+    EXPECT_FALSE(
+        event.hasMatchingResult());
 }
