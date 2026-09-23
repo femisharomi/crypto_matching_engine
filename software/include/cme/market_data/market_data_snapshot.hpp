@@ -3,8 +3,10 @@
 
 #include <cstddef>
 #include <optional>
+#include <vector>
 
 #include "cme/core/types.hpp"
+#include "cme/market_data/market_data_level.hpp"
 
 /* Stores a read-only snapshot of the current state of one order book. */
 class CMEMarketDataSnapshot
@@ -13,7 +15,8 @@ public:
     /* Creates a market data snapshot from the supplied order book state. */
     CMEMarketDataSnapshot(CMESymbol snapshotSymbol, std::optional<CMEPrice> snapshotBestBid, std::optional<CMEQuantity> snapshotBestBidQuantity, 
                         std::optional<CMEPrice> snapshotBestAsk, std::optional<CMEQuantity> snapshotBestAskQuantity, 
-                        std::size_t snapshotBuyLevelCount, std::size_t snapshotSellLevelCount);
+                        std::size_t snapshotBuyLevelCount, std::size_t snapshotSellLevelCount, std::vector<CMEMarketDataLevel> snapshotBidLevels, 
+                        std::vector<CMEMarketDataLevel> snapshotAskLevels);
 
     /* Returns the trading symbol represented by this snapshot. */
     CMESymbol getSymbol() const;
@@ -36,6 +39,12 @@ public:
     /* Returns the total remaining quantity available at the best ask when one exists. */
     const std::optional<CMEQuantity>& getBestAskQuantity() const;
 
+    /* Returns all aggregated buy levels ordered from best bid to worst bid. */
+    const std::vector<CMEMarketDataLevel>& getBidLevels() const;
+
+    /* Returns all aggregated sell levels ordered from best ask to worst ask. */
+    const std::vector<CMEMarketDataLevel>& getAskLevels() const;
+
 private:
     // The trading symbol represented by this snapshot.
     CMESymbol symbol; 
@@ -57,6 +66,12 @@ private:
 
     // The total remaining quantity available at the best ask, when one exists.
     std::optional<CMEQuantity> bestAskQuantity;
+
+    // The aggregated buy price levels ordered from best bid to worst bid.
+    std::vector<CMEMarketDataLevel> bidLevels;
+
+    // The aggregated sell price levels ordered from best ask to worst ask.
+    std::vector<CMEMarketDataLevel> askLevels;
 };
 
 #endif // CME_MARKET_DATA_MARKET_DATA_SNAPSHOT_HPP

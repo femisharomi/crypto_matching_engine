@@ -19,7 +19,9 @@ TEST(CMEMarketDataSnapshotTests, StoresCompleteSnapshotInformation)
         CMEPrice(51000),
         CMEQuantity(40),
         3,
-        4);
+        4,
+        {},
+        {});
 
     EXPECT_EQ(
         snapshot.getSymbol(),
@@ -71,7 +73,10 @@ TEST(CMEMarketDataSnapshotTests, StoresMissingBestBidAndQuantity)
         CMEPrice(51000),
         CMEQuantity(40),
         0,
-        2);
+        2,
+        {},
+        {});
+
 
     EXPECT_FALSE(
         snapshot.getBestBid().has_value());
@@ -103,7 +108,10 @@ TEST(CMEMarketDataSnapshotTests, StoresMissingBestAskAndQuantity)
         std::nullopt,
         std::nullopt,
         2,
-        0);
+        0,
+        {},
+        {});
+
 
     ASSERT_TRUE(
         snapshot.getBestBid().has_value());
@@ -135,7 +143,10 @@ TEST(CMEMarketDataSnapshotTests, EmptySnapshotContainsNoBestPricesOrQuantities)
         std::nullopt,
         std::nullopt,
         0,
-        0);
+        0,
+        {},
+        {});
+
 
     EXPECT_FALSE(
         snapshot.getBestBid().has_value());

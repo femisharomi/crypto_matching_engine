@@ -655,6 +655,8 @@ CMEMarketDataSnapshot CMEOrderBook::getMarketDataSnapshot() const
     std::optional<CMEQuantity> snapshotBestBidQuantity = std::nullopt;
     std::optional<CMEPrice> snapshotBestAsk = std::nullopt;
     std::optional<CMEQuantity> snapshotBestAskQuantity = std::nullopt;
+    std::vector<CMEMarketDataLevel> snapshotBidLevels;
+    std::vector<CMEMarketDataLevel> snapshotAskLevels;
 
     if (hasBuyLevels())
     {
@@ -676,6 +678,38 @@ CMEMarketDataSnapshot CMEOrderBook::getMarketDataSnapshot() const
             bestAskLevel.getTotalRemainingQuantity();
     }
 
+    for (std::map<std::int64_t, CMEPriceLevel>::const_reverse_iterator it =
+             buyLevels.rbegin();
+         it != buyLevels.rend();
+         ++it)
+    {
+        CMEPrice levelPrice = it->second.getPrice();
+        CMEQuantity levelQuantity =
+            it->second.getTotalRemainingQuantity();
+
+        CMEMarketDataLevel level(
+            levelPrice,
+            levelQuantity);
+
+        snapshotBidLevels.push_back(level);
+    }
+
+    for (std::map<std::int64_t, CMEPriceLevel>::const_iterator it =
+             sellLevels.begin();
+         it != sellLevels.end();
+         ++it)
+    {
+        CMEPrice levelPrice = it->second.getPrice();
+        CMEQuantity levelQuantity =
+            it->second.getTotalRemainingQuantity();
+
+        CMEMarketDataLevel level(
+            levelPrice,
+            levelQuantity);
+
+        snapshotAskLevels.push_back(level);
+    }
+
     return CMEMarketDataSnapshot(
         bookSymbol,
         snapshotBestBid,
@@ -683,5 +717,7 @@ CMEMarketDataSnapshot CMEOrderBook::getMarketDataSnapshot() const
         snapshotBestAsk,
         snapshotBestAskQuantity,
         buyLevels.size(),
-        sellLevels.size());
+        sellLevels.size(),
+        snapshotBidLevels,
+        snapshotAskLevels);
 }
