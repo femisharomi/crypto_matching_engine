@@ -652,3 +652,286 @@ TEST(CMEOrderBookTests, SnapshotQuantityChangesAfterPartialFill)
         snapshot.getBestAskQuantity().value(),
         CMEQuantity(60));
 }
+
+// ============================================================================
+// LEVEL TWO MARKET DATA TESTS
+// ============================================================================
+
+TEST(CMEOrderBookTests, EmptyBookProducesEmptyLevelTwoMarketData)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    CMEMarketDataSnapshot snapshot =
+        orderBook.getMarketDataSnapshot();
+
+    EXPECT_TRUE(
+        snapshot.getBidLevels().empty());
+
+    EXPECT_TRUE(
+        snapshot.getAskLevels().empty());
+}
+
+TEST(CMEOrderBookTests, LevelTwoBidLevelsAreOrderedBestToWorst)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(49000),
+            CMEQuantity(10))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(20))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1003),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(48000),
+            CMEQuantity(30))));
+
+    CMEMarketDataSnapshot snapshot =
+        orderBook.getMarketDataSnapshot();
+
+    const std::vector<CMEMarketDataLevel>& bidLevels =
+        snapshot.getBidLevels();
+
+    ASSERT_EQ(bidLevels.size(), 3);
+
+    EXPECT_EQ(
+        bidLevels.at(0).getPrice(),
+        CMEPrice(50000));
+
+    EXPECT_EQ(
+        bidLevels.at(1).getPrice(),
+        CMEPrice(49000));
+
+    EXPECT_EQ(
+        bidLevels.at(2).getPrice(),
+        CMEPrice(48000));
+}
+
+TEST(CMEOrderBookTests, LevelTwoAskLevelsAreOrderedBestToWorst)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(53000),
+            CMEQuantity(10))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(51000),
+            CMEQuantity(20))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1003),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(52000),
+            CMEQuantity(30))));
+
+    CMEMarketDataSnapshot snapshot =
+        orderBook.getMarketDataSnapshot();
+
+    const std::vector<CMEMarketDataLevel>& askLevels =
+        snapshot.getAskLevels();
+
+    ASSERT_EQ(askLevels.size(), 3);
+
+    EXPECT_EQ(
+        askLevels.at(0).getPrice(),
+        CMEPrice(51000));
+
+    EXPECT_EQ(
+        askLevels.at(1).getPrice(),
+        CMEPrice(52000));
+
+    EXPECT_EQ(
+        askLevels.at(2).getPrice(),
+        CMEPrice(53000));
+}
+
+TEST(CMEOrderBookTests, LevelTwoAggregatesOrdersAtSameBidPrice)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(20))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(30))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1003),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(25))));
+
+    CMEMarketDataSnapshot snapshot =
+        orderBook.getMarketDataSnapshot();
+
+    const std::vector<CMEMarketDataLevel>& bidLevels =
+        snapshot.getBidLevels();
+
+    ASSERT_EQ(bidLevels.size(), 1);
+
+    EXPECT_EQ(
+        bidLevels.at(0).getPrice(),
+        CMEPrice(50000));
+
+    EXPECT_EQ(
+        bidLevels.at(0).getQuantity(),
+        CMEQuantity(75));
+}
+
+TEST(CMEOrderBookTests, LevelTwoAggregatesOrdersAtSameAskPrice)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(51000),
+            CMEQuantity(15))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(51000),
+            CMEQuantity(25))));
+
+    CMEMarketDataSnapshot snapshot =
+        orderBook.getMarketDataSnapshot();
+
+    const std::vector<CMEMarketDataLevel>& askLevels =
+        snapshot.getAskLevels();
+
+    ASSERT_EQ(askLevels.size(), 1);
+
+    EXPECT_EQ(
+        askLevels.at(0).getPrice(),
+        CMEPrice(51000));
+
+    EXPECT_EQ(
+        askLevels.at(0).getQuantity(),
+        CMEQuantity(40));
+}
+
+TEST(CMEOrderBookTests, LevelTwoReflectsPartialFill)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(51000),
+            CMEQuantity(100))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(51000),
+            CMEQuantity(40))));
+
+    CMEMarketDataSnapshot snapshot =
+        orderBook.getMarketDataSnapshot();
+
+    const std::vector<CMEMarketDataLevel>& askLevels =
+        snapshot.getAskLevels();
+
+    ASSERT_EQ(askLevels.size(), 1);
+
+    EXPECT_EQ(
+        askLevels.at(0).getPrice(),
+        CMEPrice(51000));
+
+    EXPECT_EQ(
+        askLevels.at(0).getQuantity(),
+        CMEQuantity(60));
+}
+
+TEST(CMEOrderBookTests, LevelTwoRemovesEmptyLevelAfterCancellation)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(25))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(49000),
+            CMEQuantity(50))));
+
+    EXPECT_TRUE(
+        orderBook.cancelOrder(
+            CMEOrderId(1001)));
+
+    CMEMarketDataSnapshot snapshot =
+        orderBook.getMarketDataSnapshot();
+
+    const std::vector<CMEMarketDataLevel>& bidLevels =
+        snapshot.getBidLevels();
+
+    ASSERT_EQ(bidLevels.size(), 1);
+
+    EXPECT_EQ(
+        bidLevels.at(0).getPrice(),
+        CMEPrice(49000));
+
+    EXPECT_EQ(
+        bidLevels.at(0).getQuantity(),
+        CMEQuantity(50));
+}
