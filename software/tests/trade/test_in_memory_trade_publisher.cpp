@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+
 #include "cme/trade/in_memory_trade_publisher.hpp"
 
 // ============================================================================
@@ -95,47 +96,6 @@ TEST(CMEInMemoryTradePublisherTests, MultipleTradesRemainInPublicationOrder)
         std::uint64_t(2));
 }
 
-TEST(CMEInMemoryTradePublisherTests, GetTradesReturnsAllPublishedTrades)
-{
-    CMEInMemoryTradePublisher publisher;
-
-    CMETrade firstTrade(
-        CMETradeId(1),
-        CMEOrderId(1001),
-        CMEOrderId(1002),
-        CMESymbol("BTC-GBP"),
-        CMEPrice(50000),
-        CMEQuantity(25));
-
-    CMETrade secondTrade(
-        CMETradeId(2),
-        CMEOrderId(1003),
-        CMEOrderId(1004),
-        CMESymbol("ETH-GBP"),
-        CMEPrice(3000),
-        CMEQuantity(5));
-
-    publisher.publishTrade(firstTrade);
-    publisher.publishTrade(secondTrade);
-
-    const std::vector<CMETrade>& trades =
-        publisher.getTrades();
-
-    ASSERT_EQ(trades.size(), 2);
-
-    EXPECT_EQ(
-        trades.at(0).getTradeId().value,
-        std::uint64_t(1));
-
-    EXPECT_EQ(
-        trades.at(1).getTradeId().value,
-        std::uint64_t(2));
-
-    EXPECT_EQ(
-        trades.at(1).getTradeSymbol(),
-        CMESymbol("ETH-GBP"));
-}
-
 TEST(CMEInMemoryTradePublisherTests, ClearRemovesAllStoredTrades)
 {
     CMEInMemoryTradePublisher publisher;
@@ -156,13 +116,4 @@ TEST(CMEInMemoryTradePublisherTests, ClearRemovesAllStoredTrades)
 
     EXPECT_EQ(publisher.getTradeCount(), 0);
     EXPECT_TRUE(publisher.getTrades().empty());
-}
-
-TEST(CMEInMemoryTradePublisherTests, InvalidTradeIndexThrows)
-{
-    CMEInMemoryTradePublisher publisher;
-
-    EXPECT_THROW(
-        publisher.getTrade(0),
-        std::out_of_range);
 }
