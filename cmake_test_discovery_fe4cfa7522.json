@@ -1,0 +1,736 @@
+{
+  "tests": 122,
+  "name": "AllTests",
+  "testsuites": [
+    {
+      "name": "CMECoreTypesTests",
+      "tests": 8,
+      "testsuite": [
+        {
+          "name": "BuyIsDifferentFromSell",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/core\/test_types.cpp",
+          "line": 13
+        },
+        {
+          "name": "PricesWithTheSameValueAreEqual",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/core\/test_types.cpp",
+          "line": 25
+        },
+        {
+          "name": "LowerPriceIsLessThanHigherPrice",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/core\/test_types.cpp",
+          "line": 33
+        },
+        {
+          "name": "QuantitiesWithTheSameValueAreEqual",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/core\/test_types.cpp",
+          "line": 45
+        },
+        {
+          "name": "SmallerQuantityIsLessThanLargerQuantity",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/core\/test_types.cpp",
+          "line": 53
+        },
+        {
+          "name": "OrderIdsWithTheSameValueAreEqual",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/core\/test_types.cpp",
+          "line": 65
+        },
+        {
+          "name": "SymbolsWithTheSameValueAreEqual",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/core\/test_types.cpp",
+          "line": 77
+        },
+        {
+          "name": "TimeInForceValuesAreDifferent",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/core\/test_types.cpp",
+          "line": 89
+        }
+      ]
+    },
+    {
+      "name": "CMEOrderTests",
+      "tests": 7,
+      "testsuite": [
+        {
+          "name": "ConstructorStoresAllOrderInformation",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order.cpp",
+          "line": 13
+        },
+        {
+          "name": "ApplyingPartialFillReducesRemainingQuantity",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order.cpp",
+          "line": 35
+        },
+        {
+          "name": "ApplyingFullFillFillsOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order.cpp",
+          "line": 57
+        },
+        {
+          "name": "RejectsFillLargerThanRemainingQuantity",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order.cpp",
+          "line": 76
+        },
+        {
+          "name": "RejectsInvalidFillQuantity",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order.cpp",
+          "line": 94
+        },
+        {
+          "name": "ConstructorStoresMarketOrderFlag",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order.cpp",
+          "line": 118
+        },
+        {
+          "name": "ConstructorStoresTimeInForce",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order.cpp",
+          "line": 135
+        }
+      ]
+    },
+    {
+      "name": "CMEOrderValidationTests",
+      "tests": 6,
+      "testsuite": [
+        {
+          "name": "AcceptsValidOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order_validation.cpp",
+          "line": 13
+        },
+        {
+          "name": "RejectsZeroOrderId",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order_validation.cpp",
+          "line": 36
+        },
+        {
+          "name": "RejectsEmptySymbol",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order_validation.cpp",
+          "line": 59
+        },
+        {
+          "name": "RejectsInvalidPrice",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order_validation.cpp",
+          "line": 82
+        },
+        {
+          "name": "RejectsInvalidQuantity",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order_validation.cpp",
+          "line": 105
+        },
+        {
+          "name": "ReturnsFirstValidationError",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order_validation.cpp",
+          "line": 128
+        }
+      ]
+    },
+    {
+      "name": "CMEPriceLevelTests",
+      "tests": 5,
+      "testsuite": [
+        {
+          "name": "NewPriceLevelStoresItsPriceAndStartsEmpty",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_price_level.cpp",
+          "line": 13
+        },
+        {
+          "name": "AddsOrderWithMatchingPrice",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_price_level.cpp",
+          "line": 26
+        },
+        {
+          "name": "RejectsOrderWithDifferentPrice",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_price_level.cpp",
+          "line": 47
+        },
+        {
+          "name": "KeepsOrdersInFirstInFirstOutOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_price_level.cpp",
+          "line": 69
+        },
+        {
+          "name": "RemovesTheFrontOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_price_level.cpp",
+          "line": 100
+        }
+      ]
+    },
+    {
+      "name": "CMEOrderBookTests",
+      "tests": 41,
+      "testsuite": [
+        {
+          "name": "NewOrderBookStartsEmpty",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 14
+        },
+        {
+          "name": "AddsBuyAndSellOrders",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 27
+        },
+        {
+          "name": "ReturnsBestBidAndBestAsk",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 54
+        },
+        {
+          "name": "RejectsInvalidOrders",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 98
+        },
+        {
+          "name": "MatchingOrdersCreateTrade",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 142
+        },
+        {
+          "name": "PartialFillLeavesRemainingQuantity",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 188
+        },
+        {
+          "name": "IncomingOrderCanMatchMultipleRestingOrders",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 229
+        },
+        {
+          "name": "CancelsExistingOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 279
+        },
+        {
+          "name": "CancellingUnknownOrderReturnsFalse",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 297
+        },
+        {
+          "name": "ModifiesExistingOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 309
+        },
+        {
+          "name": "MarketOrderMatchesAvailableLiquidity",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 344
+        },
+        {
+          "name": "UnmatchedMarketOrderNeverRests",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 375
+        },
+        {
+          "name": "ImmediateOrCancelDiscardsRemainingQuantity",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 396
+        },
+        {
+          "name": "FillOrKillExecutesWhenFullyMatchable",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 432
+        },
+        {
+          "name": "FillOrKillRejectsWhenNotFullyMatchable",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 463
+        },
+        {
+          "name": "ProcessOrderReturnsRestingStatus",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 495
+        },
+        {
+          "name": "ProcessOrderReturnsRejectedStatus",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 516
+        },
+        {
+          "name": "EmptyBookProducesEmptyMarketDataSnapshot",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 541
+        },
+        {
+          "name": "SnapshotContainsBestPricesAndQuantities",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 565
+        },
+        {
+          "name": "SnapshotQuantityChangesAfterPartialFill",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 625
+        },
+        {
+          "name": "EmptyBookProducesEmptyLevelTwoMarketData",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 660
+        },
+        {
+          "name": "LevelTwoBidLevelsAreOrderedBestToWorst",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 675
+        },
+        {
+          "name": "LevelTwoAskLevelsAreOrderedBestToWorst",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 725
+        },
+        {
+          "name": "LevelTwoAggregatesOrdersAtSameBidPrice",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 775
+        },
+        {
+          "name": "LevelTwoAggregatesOrdersAtSameAskPrice",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 821
+        },
+        {
+          "name": "LevelTwoReflectsPartialFill",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 859
+        },
+        {
+          "name": "LevelTwoRemovesEmptyLevelAfterCancellation",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 897
+        },
+        {
+          "name": "NewOrderBookStartsWithSequenceNumberZero",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 943
+        },
+        {
+          "name": "RestingOrderAdvancesSequenceNumber",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 953
+        },
+        {
+          "name": "MultipleRestingOrdersAdvanceSequenceNumber",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 971
+        },
+        {
+          "name": "SuccessfulCancellationAdvancesSequenceNumber",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 997
+        },
+        {
+          "name": "FailedCancellationDoesNotAdvanceSequenceNumber",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 1019
+        },
+        {
+          "name": "SuccessfulModificationAdvancesSequenceNumberOnce",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 1033
+        },
+        {
+          "name": "FailedModificationDoesNotAdvanceSequenceNumber",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 1057
+        },
+        {
+          "name": "MarketDataSnapshotContainsCurrentSequenceNumber",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 1073
+        },
+        {
+          "name": "RejectedOrderDoesNotAdvanceSequenceNumber",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order_book\/test_order_book.cpp",
+          "line": 1102
+        },
+        {
+          "name": "SnapshotUsesProvidedClockTimestamp",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/time\/test_test_clock.cpp",
+          "line": 73
+        },
+        {
+          "name": "SnapshotTimestampChangesWhenClockAdvances",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/time\/test_test_clock.cpp",
+          "line": 90
+        },
+        {
+          "name": "SnapshotTimestampCanBeSetDeterministically",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/time\/test_test_clock.cpp",
+          "line": 116
+        },
+        {
+          "name": "SnapshotUsesZeroTimestampWhenNoClockProvided",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/time\/test_test_clock.cpp",
+          "line": 144
+        },
+        {
+          "name": "SnapshotContainsSequenceNumberAndTimestamp",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/time\/test_test_clock.cpp",
+          "line": 157
+        }
+      ]
+    },
+    {
+      "name": "CMETradeTests",
+      "tests": 1,
+      "testsuite": [
+        {
+          "name": "NewTradeStoresAllExecutionDetails",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/trade\/test_trade.cpp",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "name": "CMEOrderRejectionTests",
+      "tests": 2,
+      "testsuite": [
+        {
+          "name": "ConstructorStoresAllRejectionInformation",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order_rejection.cpp",
+          "line": 13
+        },
+        {
+          "name": "DifferentReasonsRemainDistinct",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/order\/test_order_rejection.cpp",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "name": "CMEMatchingResultTests",
+      "tests": 3,
+      "testsuite": [
+        {
+          "name": "StoresRestingOrderResult",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/matching\/test_matching_result.cpp",
+          "line": 13
+        },
+        {
+          "name": "StoresFilledOrderWithTrade",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/matching\/test_matching_result.cpp",
+          "line": 33
+        },
+        {
+          "name": "StoresRejectedOrderWithRejectionInformation",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/matching\/test_matching_result.cpp",
+          "line": 70
+        }
+      ]
+    },
+    {
+      "name": "CMEMatchingEngineTests",
+      "tests": 9,
+      "testsuite": [
+        {
+          "name": "NewEngineStartsWithNoOrderBooks",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_matching_engine.cpp",
+          "line": 15
+        },
+        {
+          "name": "ProcessingOrderCreatesOrderBook",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_matching_engine.cpp",
+          "line": 22
+        },
+        {
+          "name": "DifferentSymbolsUseDifferentOrderBooks",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_matching_engine.cpp",
+          "line": 49
+        },
+        {
+          "name": "SubmitCommandProducesOrderProcessedEvent",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_matching_engine.cpp",
+          "line": 96
+        },
+        {
+          "name": "InvalidSubmittedOrderProducesRejectedMatchingResult",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_matching_engine.cpp",
+          "line": 127
+        },
+        {
+          "name": "CancelCommandProducesOrderCancelledEvent",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_matching_engine.cpp",
+          "line": 165
+        },
+        {
+          "name": "ModifyCommandProducesOrderModifiedEvent",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_matching_engine.cpp",
+          "line": 206
+        },
+        {
+          "name": "UnknownCommandProducesCommandRejectedEvent",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_matching_engine.cpp",
+          "line": 255
+        },
+        {
+          "name": "EnginePassesPublisherToCreatedOrderBooks",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_matching_engine.cpp",
+          "line": 303
+        }
+      ]
+    },
+    {
+      "name": "CMEEngineCommandTests",
+      "tests": 3,
+      "testsuite": [
+        {
+          "name": "SubmitCommandStoresSubmittedOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_engine_command.cpp",
+          "line": 13
+        },
+        {
+          "name": "CancelCommandStoresSymbolAndOrderId",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_engine_command.cpp",
+          "line": 41
+        },
+        {
+          "name": "ModifyCommandStoresReplacementValues",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_engine_command.cpp",
+          "line": 65
+        }
+      ]
+    },
+    {
+      "name": "CMEEngineEventTests",
+      "tests": 2,
+      "testsuite": [
+        {
+          "name": "StoresOrderProcessedEventWithMatchingResult",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_engine_event.cpp",
+          "line": 13
+        },
+        {
+          "name": "StoresEventWithoutMatchingResult",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/engine\/test_engine_event.cpp",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "name": "CMETradePublisherTests",
+      "tests": 3,
+      "testsuite": [
+        {
+          "name": "MatchingOrderPublishesGeneratedTrade",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/trade\/test_trade_publisher.cpp",
+          "line": 34
+        },
+        {
+          "name": "RestingOrderDoesNotPublishTrade",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/trade\/test_trade_publisher.cpp",
+          "line": 80
+        },
+        {
+          "name": "OrderBookWorksWithoutPublisher",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/trade\/test_trade_publisher.cpp",
+          "line": 102
+        }
+      ]
+    },
+    {
+      "name": "CMEInMemoryTradePublisherTests",
+      "tests": 4,
+      "testsuite": [
+        {
+          "name": "NewPublisherStartsEmpty",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/trade\/test_in_memory_trade_publisher.cpp",
+          "line": 13
+        },
+        {
+          "name": "PublishedTradeIsStored",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/trade\/test_in_memory_trade_publisher.cpp",
+          "line": 21
+        },
+        {
+          "name": "MultipleTradesRemainInPublicationOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/trade\/test_in_memory_trade_publisher.cpp",
+          "line": 65
+        },
+        {
+          "name": "ClearRemovesAllStoredTrades",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/trade\/test_in_memory_trade_publisher.cpp",
+          "line": 99
+        }
+      ]
+    },
+    {
+      "name": "CMEMarketDataSnapshotTests",
+      "tests": 4,
+      "testsuite": [
+        {
+          "name": "StoresCompleteSnapshotInformation",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/market_data\/test_market_data_snapshot.cpp",
+          "line": 16
+        },
+        {
+          "name": "StoresMissingBestBidAndQuantity",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/market_data\/test_market_data_snapshot.cpp",
+          "line": 115
+        },
+        {
+          "name": "StoresMissingBestAskAndQuantity",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/market_data\/test_market_data_snapshot.cpp",
+          "line": 173
+        },
+        {
+          "name": "EmptySnapshotContainsNoBestPricesOrQuantities",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/market_data\/test_market_data_snapshot.cpp",
+          "line": 231
+        }
+      ]
+    },
+    {
+      "name": "CMEMarketDataLevelTests",
+      "tests": 1,
+      "testsuite": [
+        {
+          "name": "StoresPriceAndAggregatedQuantity",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/market_data\/test_market_data_level.cpp",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "name": "CMESystemClockTests",
+      "tests": 2,
+      "testsuite": [
+        {
+          "name": "ReturnsNonZeroTimestamp",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/time\/test_system_clock.cpp",
+          "line": 15
+        },
+        {
+          "name": "LaterReadDoesNotGoBackwards",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/time\/test_system_clock.cpp",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "name": "CMETestClockTests",
+      "tests": 5,
+      "testsuite": [
+        {
+          "name": "StartsAtZeroByDefault",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/time\/test_test_clock.cpp",
+          "line": 16
+        },
+        {
+          "name": "StoresInitialTime",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/time\/test_test_clock.cpp",
+          "line": 25
+        },
+        {
+          "name": "SetTimeChangesCurrentTime",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/time\/test_test_clock.cpp",
+          "line": 34
+        },
+        {
+          "name": "AdvanceTimeIncreasesCurrentTime",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/time\/test_test_clock.cpp",
+          "line": 45
+        },
+        {
+          "name": "CanAdvanceTimeMultipleTimes",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/time\/test_test_clock.cpp",
+          "line": 56
+        }
+      ]
+    },
+    {
+      "name": "CMEOrderBuilderTests",
+      "tests": 9,
+      "testsuite": [
+        {
+          "name": "BuildsOrderWithDefaultValues",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/fixtures\/test_order_builder.cpp",
+          "line": 13
+        },
+        {
+          "name": "BuildsOrderWithSpecifiedOrderId",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/fixtures\/test_order_builder.cpp",
+          "line": 52
+        },
+        {
+          "name": "BuildsOrderWithSpecifiedSymbol",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/fixtures\/test_order_builder.cpp",
+          "line": 70
+        },
+        {
+          "name": "BuildsOrderWithSpecifiedSide",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/fixtures\/test_order_builder.cpp",
+          "line": 88
+        },
+        {
+          "name": "BuildsOrderWithSpecifiedPrice",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/fixtures\/test_order_builder.cpp",
+          "line": 106
+        },
+        {
+          "name": "BuildsOrderWithSpecifiedQuantity",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/fixtures\/test_order_builder.cpp",
+          "line": 124
+        },
+        {
+          "name": "BuildsMarketOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/fixtures\/test_order_builder.cpp",
+          "line": 146
+        },
+        {
+          "name": "BuildsOrderWithSpecifiedTimeInForce",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/fixtures\/test_order_builder.cpp",
+          "line": 163
+        },
+        {
+          "name": "BuildsOrderWithMultipleSpecifiedValues",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/fixtures\/test_order_builder.cpp",
+          "line": 181
+        }
+      ]
+    },
+    {
+      "name": "CMEOrderInputParserTests",
+      "tests": 5,
+      "testsuite": [
+        {
+          "name": "ParsesValidBuyOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/input\/test_order_input_parser.cpp",
+          "line": 11
+        },
+        {
+          "name": "ParsesValidSellOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/input\/test_order_input_parser.cpp",
+          "line": 23
+        },
+        {
+          "name": "ParsesValidCancellation",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/input\/test_order_input_parser.cpp",
+          "line": 35
+        },
+        {
+          "name": "RejectsInvalidInput",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/input\/test_order_input_parser.cpp",
+          "line": 47
+        },
+        {
+          "name": "RejectsIncompleteOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/input\/test_order_input_parser.cpp",
+          "line": 59
+        }
+      ]
+    },
+    {
+      "name": "CMEFileOrderReaderTests",
+      "tests": 2,
+      "testsuite": [
+        {
+          "name": "OpensExistingOrderFile",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/input\/test_file_order_reader.cpp",
+          "line": 11
+        },
+        {
+          "name": "ReadsOrdersInFileOrder",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/input\/test_file_order_reader.cpp",
+          "line": 19
+        }
+      ]
+    }
+  ]
+}
