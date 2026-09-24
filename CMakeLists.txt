@@ -102,6 +102,8 @@ add_executable(cme_tests
     software/tests/market_data/test_market_data_level.cpp
     software/tests/time/test_system_clock.cpp
     software/tests/time/test_test_clock.cpp
+    software/tests/fixtures/order_builder.cpp
+    software/tests/fixtures/test_order_builder.cpp
 )
 
 # Links the test runner to your core engine and the downloaded GoogleTest framework.
