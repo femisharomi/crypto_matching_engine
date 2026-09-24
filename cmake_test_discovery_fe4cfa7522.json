@@ -1,5 +1,5 @@
 {
-  "tests": 122,
+  "tests": 124,
   "name": "AllTests",
   "testsuites": [
     {
@@ -729,6 +729,22 @@
           "name": "ReadsOrdersInFileOrder",
           "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/input\/test_file_order_reader.cpp",
           "line": 19
+        }
+      ]
+    },
+    {
+      "name": "CMESimulatedOrderFeedTests",
+      "tests": 2,
+      "testsuite": [
+        {
+          "name": "OpensExistingFeedFile",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/input\/test_simulated_order_feed.cpp",
+          "line": 12
+        },
+        {
+          "name": "ProcessesAllCommandsFromFile",
+          "file": "\/Users\/femi\/Documents\/github\/crypto_matching_engine\/software\/tests\/input\/test_simulated_order_feed.cpp",
+          "line": 23
         }
       ]
     }
