@@ -1,6 +1,7 @@
 #ifndef CME_MARKET_DATA_MARKET_DATA_SNAPSHOT_HPP
 #define CME_MARKET_DATA_MARKET_DATA_SNAPSHOT_HPP
 
+#include <cstdint>
 #include <cstddef>
 #include <optional>
 #include <vector>
@@ -16,7 +17,7 @@ public:
     CMEMarketDataSnapshot(CMESymbol snapshotSymbol, std::optional<CMEPrice> snapshotBestBid, std::optional<CMEQuantity> snapshotBestBidQuantity, 
                         std::optional<CMEPrice> snapshotBestAsk, std::optional<CMEQuantity> snapshotBestAskQuantity, 
                         std::size_t snapshotBuyLevelCount, std::size_t snapshotSellLevelCount, std::vector<CMEMarketDataLevel> snapshotBidLevels, 
-                        std::vector<CMEMarketDataLevel> snapshotAskLevels);
+                        std::vector<CMEMarketDataLevel> snapshotAskLevels, std::uint64_t snapshotSequenceNumber);
 
     /* Returns the trading symbol represented by this snapshot. */
     CMESymbol getSymbol() const;
@@ -45,6 +46,9 @@ public:
     /* Returns all aggregated sell levels ordered from best ask to worst ask. */
     const std::vector<CMEMarketDataLevel>& getAskLevels() const;
 
+    /* Returns the order book sequence number associated with this snapshot. */
+    std::uint64_t getSequenceNumber() const;
+
 private:
     // The trading symbol represented by this snapshot.
     CMESymbol symbol; 
@@ -72,6 +76,9 @@ private:
 
     // The aggregated sell price levels ordered from best ask to worst ask.
     std::vector<CMEMarketDataLevel> askLevels;
+
+    // The order book sequence number when this snapshot was created.
+    std::uint64_t sequenceNumber;
 };
 
 #endif // CME_MARKET_DATA_MARKET_DATA_SNAPSHOT_HPP

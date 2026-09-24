@@ -1,6 +1,7 @@
 #ifndef CME_ORDER_BOOK_ORDER_BOOK_HPP
 #define CME_ORDER_BOOK_ORDER_BOOK_HPP
 
+#include <cstdint>
 #include <cstddef>
 #include <map>
 #include <optional>
@@ -62,6 +63,9 @@ public:
     /* Returns a snapshot describing the current state of this order book. */
     CMEMarketDataSnapshot getMarketDataSnapshot() const;
 
+    /* Returns the sequence number of the latest successful order book change. */
+    std::uint64_t getSequenceNumber() const;
+
 private:
     // The trading symbol represented by this order book.
     CMESymbol bookSymbol; 
@@ -80,6 +84,12 @@ private:
 
     // The identifier assigned to the next generated trade
     std::uint64_t nextTradeId;
+
+    // The trade publisher that receives generated trades when one is configured.
+    CMETradePublisher* tradePublisher;
+
+    // The sequence number of the latest successful order book change.
+    std::uint64_t sequenceNumber;
 
     /* Returns whether any buy price levels exist. */
     bool hasBuyLevels() const;
@@ -105,7 +115,7 @@ private:
     /* Creates rejection information from an order validation result. */
     CMEOrderRejection createValidationRejection(const CMEOrder& order, CMEOrderValidationResult validationResult) const;
 
-    // The trade publisher that receives generated trades when one is configured.
-    CMETradePublisher* tradePublisher;
+    /* Removes an order without advancing the order book sequence number. */
+    bool removeOrderWithoutSequenceUpdate(CMEOrderId orderId);
 };
 #endif // CME_ORDER_BOOK_ORDER_BOOK_HPP

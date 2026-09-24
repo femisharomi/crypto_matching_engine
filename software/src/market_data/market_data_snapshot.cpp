@@ -3,10 +3,11 @@
 CMEMarketDataSnapshot::CMEMarketDataSnapshot(CMESymbol snapshotSymbol, std::optional<CMEPrice> snapshotBestBid, std::optional<CMEQuantity> snapshotBestBidQuantity,
                     std::optional<CMEPrice> snapshotBestAsk, std::optional<CMEQuantity> snapshotBestAskQuantity, std::size_t snapshotBuyLevelCount,
                     std::size_t snapshotSellLevelCount, std::vector<CMEMarketDataLevel> snapshotBidLevels, 
-                        std::vector<CMEMarketDataLevel> snapshotAskLevels) : 
+                        std::vector<CMEMarketDataLevel> snapshotAskLevels, std::uint64_t snapshotSequenceNumber) : 
                     symbol(snapshotSymbol), bestBid(snapshotBestBid), bestBidQuantity(snapshotBestBidQuantity),
                     bestAsk(snapshotBestAsk), bestAskQuantity(snapshotBestAskQuantity),buyLevelCount(snapshotBuyLevelCount), 
-                    sellLevelCount(snapshotSellLevelCount), bidLevels(snapshotBidLevels), askLevels(snapshotAskLevels)
+                    sellLevelCount(snapshotSellLevelCount), bidLevels(snapshotBidLevels), askLevels(snapshotAskLevels),
+                    sequenceNumber(snapshotSequenceNumber)
 {
     
 }
@@ -46,16 +47,17 @@ const std::optional<CMEQuantity>& CMEMarketDataSnapshot::getBestAskQuantity() co
     return bestAskQuantity;
 }
 
-/* Returns all aggregated buy levels ordered from best bid to worst bid. */
-const std::vector<CMEMarketDataLevel>&
-CMEMarketDataSnapshot::getBidLevels() const
+const std::vector<CMEMarketDataLevel>& CMEMarketDataSnapshot::getBidLevels() const
 {
     return bidLevels;
 }
 
-/* Returns all aggregated sell levels ordered from best ask to worst ask. */
-const std::vector<CMEMarketDataLevel>&
-CMEMarketDataSnapshot::getAskLevels() const
+const std::vector<CMEMarketDataLevel>& CMEMarketDataSnapshot::getAskLevels() const
 {
     return askLevels;
+}
+
+std::uint64_t CMEMarketDataSnapshot::getSequenceNumber() const
+{
+    return sequenceNumber;
 }
