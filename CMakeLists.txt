@@ -19,7 +19,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Creates a library target named 'cme_core' to hold the main engine logic.
 add_library(cme_core
-    software/src/cme_core.cpp
     software/src/order/order.cpp
     software/src/order/order_validation.cpp
     software/src/order_book/price_level.cpp
@@ -35,6 +34,8 @@ add_library(cme_core
     software/src/market_data/market_data_level.cpp
     software/src/time/system_clock.cpp
     software/src/time/test_clock.cpp
+    software/src/input/order_input_parser.cpp
+    software/src/input/file_order_reader.cpp
 )
 
 # Specifies where the header (.h/.hpp) files for 'cme_core' are located.
@@ -104,6 +105,8 @@ add_executable(cme_tests
     software/tests/time/test_test_clock.cpp
     software/tests/fixtures/order_builder.cpp
     software/tests/fixtures/test_order_builder.cpp
+    software/tests/input/test_order_input_parser.cpp
+    software/tests/input/test_file_order_reader.cpp
 )
 
 # Links the test runner to your core engine and the downloaded GoogleTest framework.
@@ -118,5 +121,8 @@ target_link_libraries(cme_tests
 include(GoogleTest)
 
 # Automatically scans your test source files and registers individual tests with CTest.
-gtest_discover_tests(cme_tests)
+gtest_discover_tests(
+    cme_tests
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
 
