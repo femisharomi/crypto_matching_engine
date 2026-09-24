@@ -3,9 +3,11 @@
 
 CMEOrderBook::CMEOrderBook(
     CMESymbol symbol,
-    CMETradePublisher* publisher)
+    CMETradePublisher* publisher,
+    CMEClock* bookclock)
     : bookSymbol(symbol),
       tradePublisher(publisher),
+      clock(bookclock),
       nextTradeId(1),
       sequenceNumber(0)
 {
@@ -690,6 +692,7 @@ CMEMarketDataSnapshot CMEOrderBook::getMarketDataSnapshot() const
     std::optional<CMEQuantity> snapshotBestAskQuantity = std::nullopt;
     std::vector<CMEMarketDataLevel> snapshotBidLevels;
     std::vector<CMEMarketDataLevel> snapshotAskLevels;
+    std::uint64_t snapshotTimestamp = 0;
 
     if (hasBuyLevels())
     {
@@ -743,6 +746,11 @@ CMEMarketDataSnapshot CMEOrderBook::getMarketDataSnapshot() const
         snapshotAskLevels.push_back(level);
     }
 
+    if(clock != nullptr)
+    {
+        snapshotTimestamp = clock->now();
+    }
+
     return CMEMarketDataSnapshot(
         bookSymbol,
         snapshotBestBid,
@@ -753,5 +761,6 @@ CMEMarketDataSnapshot CMEOrderBook::getMarketDataSnapshot() const
         sellLevels.size(),
         snapshotBidLevels,
         snapshotAskLevels,
-        sequenceNumber);
+        sequenceNumber,
+        snapshotTimestamp);
 }

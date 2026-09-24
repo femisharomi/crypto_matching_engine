@@ -17,7 +17,8 @@ public:
     CMEMarketDataSnapshot(CMESymbol snapshotSymbol, std::optional<CMEPrice> snapshotBestBid, std::optional<CMEQuantity> snapshotBestBidQuantity, 
                         std::optional<CMEPrice> snapshotBestAsk, std::optional<CMEQuantity> snapshotBestAskQuantity, 
                         std::size_t snapshotBuyLevelCount, std::size_t snapshotSellLevelCount, std::vector<CMEMarketDataLevel> snapshotBidLevels, 
-                        std::vector<CMEMarketDataLevel> snapshotAskLevels, std::uint64_t snapshotSequenceNumber);
+                        std::vector<CMEMarketDataLevel> snapshotAskLevels, std::uint64_t snapshotSequenceNumber, 
+                        std::uint64_t snapshotTimestamp);
 
     /* Returns the trading symbol represented by this snapshot. */
     CMESymbol getSymbol() const;
@@ -49,6 +50,9 @@ public:
     /* Returns the order book sequence number associated with this snapshot. */
     std::uint64_t getSequenceNumber() const;
 
+    /* Returns the timestamp when this snapshot was created. */
+    std::uint64_t getTimestamp() const;
+
 private:
     // The trading symbol represented by this snapshot.
     CMESymbol symbol; 
@@ -79,6 +83,9 @@ private:
 
     // The order book sequence number when this snapshot was created.
     std::uint64_t sequenceNumber;
+
+    // The timestamp when this market data snapshot was created.
+    std::uint64_t timestamp;
 };
 
 #endif // CME_MARKET_DATA_MARKET_DATA_SNAPSHOT_HPP

@@ -37,7 +37,8 @@ TEST(CMEMarketDataSnapshotTests, StoresCompleteSnapshotInformation)
         1,
         bidLevels,
         askLevels,
-        42);
+        42,
+        1000000);
 
     EXPECT_EQ(
         snapshot.getSymbol(),
@@ -106,6 +107,9 @@ TEST(CMEMarketDataSnapshotTests, StoresCompleteSnapshotInformation)
     EXPECT_EQ(
         snapshot.getSequenceNumber(),
         42);
+    EXPECT_EQ(
+        snapshot.getTimestamp(),
+        1000000);
 }
 
 TEST(CMEMarketDataSnapshotTests, StoresMissingBestBidAndQuantity)
@@ -128,7 +132,8 @@ TEST(CMEMarketDataSnapshotTests, StoresMissingBestBidAndQuantity)
         1,
         bidLevels,
         askLevels,
-        10);
+        10,
+        1000000);
 
     EXPECT_FALSE(
         snapshot.getBestBid().has_value());
@@ -160,6 +165,9 @@ TEST(CMEMarketDataSnapshotTests, StoresMissingBestBidAndQuantity)
     EXPECT_EQ(
         snapshot.getSequenceNumber(),
         10);
+    EXPECT_EQ(
+        snapshot.getTimestamp(),
+        1000000);
 }
 
 TEST(CMEMarketDataSnapshotTests, StoresMissingBestAskAndQuantity)
@@ -182,7 +190,8 @@ TEST(CMEMarketDataSnapshotTests, StoresMissingBestAskAndQuantity)
         0,
         bidLevels,
         askLevels,
-        15);
+        15,
+        1000000);
 
     ASSERT_TRUE(
         snapshot.getBestBid().has_value());
@@ -214,6 +223,9 @@ TEST(CMEMarketDataSnapshotTests, StoresMissingBestAskAndQuantity)
     EXPECT_EQ(
         snapshot.getSequenceNumber(),
         15);
+    EXPECT_EQ(
+        snapshot.getTimestamp(),
+        1000000);
 }
 
 TEST(CMEMarketDataSnapshotTests, EmptySnapshotContainsNoBestPricesOrQuantities)
@@ -231,7 +243,8 @@ TEST(CMEMarketDataSnapshotTests, EmptySnapshotContainsNoBestPricesOrQuantities)
         0,
         bidLevels,
         askLevels,
-        0);
+        0,
+        1000000);
 
     EXPECT_EQ(
         snapshot.getSymbol(),
@@ -266,4 +279,7 @@ TEST(CMEMarketDataSnapshotTests, EmptySnapshotContainsNoBestPricesOrQuantities)
     EXPECT_EQ(
         snapshot.getSequenceNumber(),
         0);
+    EXPECT_EQ(
+        snapshot.getTimestamp(),
+        1000000);
 }
