@@ -935,3 +935,189 @@ TEST(CMEOrderBookTests, LevelTwoRemovesEmptyLevelAfterCancellation)
         bidLevels.at(0).getQuantity(),
         CMEQuantity(50));
 }
+
+// ============================================================================
+// SEQUENCE NUMBER TESTS
+// ============================================================================
+
+TEST(CMEOrderBookTests, NewOrderBookStartsWithSequenceNumberZero)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_EQ(
+        orderBook.getSequenceNumber(),
+        0);
+}
+
+TEST(CMEOrderBookTests, RestingOrderAdvancesSequenceNumber)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(10))));
+
+    EXPECT_EQ(
+        orderBook.getSequenceNumber(),
+        1);
+}
+
+TEST(CMEOrderBookTests, MultipleRestingOrdersAdvanceSequenceNumber)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(10))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(49000),
+            CMEQuantity(20))));
+
+    EXPECT_EQ(
+        orderBook.getSequenceNumber(),
+        2);
+}
+
+TEST(CMEOrderBookTests, SuccessfulCancellationAdvancesSequenceNumber)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(10))));
+
+    EXPECT_TRUE(
+        orderBook.cancelOrder(
+            CMEOrderId(1001)));
+
+    EXPECT_EQ(
+        orderBook.getSequenceNumber(),
+        2);
+}
+
+TEST(CMEOrderBookTests, FailedCancellationDoesNotAdvanceSequenceNumber)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_FALSE(
+        orderBook.cancelOrder(
+            CMEOrderId(9999)));
+
+    EXPECT_EQ(
+        orderBook.getSequenceNumber(),
+        0);
+}
+
+TEST(CMEOrderBookTests, SuccessfulModificationAdvancesSequenceNumberOnce)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(10))));
+
+    EXPECT_TRUE(
+        orderBook.modifyOrder(
+            CMEOrderId(1001),
+            CMEPrice(49000),
+            CMEQuantity(20)));
+
+    EXPECT_EQ(
+        orderBook.getSequenceNumber(),
+        2);
+}
+
+TEST(CMEOrderBookTests, FailedModificationDoesNotAdvanceSequenceNumber)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_FALSE(
+        orderBook.modifyOrder(
+            CMEOrderId(9999),
+            CMEPrice(49000),
+            CMEQuantity(20)));
+
+    EXPECT_EQ(
+        orderBook.getSequenceNumber(),
+        0);
+}
+
+TEST(CMEOrderBookTests, MarketDataSnapshotContainsCurrentSequenceNumber)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1001),
+            CMESymbol("BTC-GBP"),
+            CMESide::BUY,
+            CMEPrice(50000),
+            CMEQuantity(10))));
+
+    EXPECT_TRUE(orderBook.addOrder(
+        CMEOrder(
+            CMEOrderId(1002),
+            CMESymbol("BTC-GBP"),
+            CMESide::SELL,
+            CMEPrice(51000),
+            CMEQuantity(20))));
+
+    CMEMarketDataSnapshot snapshot =
+        orderBook.getMarketDataSnapshot();
+
+    EXPECT_EQ(
+        snapshot.getSequenceNumber(),
+        2);
+}
+
+TEST(CMEOrderBookTests, RejectedOrderDoesNotAdvanceSequenceNumber)
+{
+    CMEOrderBook orderBook(
+        CMESymbol("BTC-GBP"));
+
+    CMEMatchingResult result =
+        orderBook.processOrder(
+            CMEOrder(
+                CMEOrderId(1001),
+                CMESymbol("BTC-GBP"),
+                CMESide::BUY,
+                CMEPrice(0),
+                CMEQuantity(10)));
+
+    EXPECT_EQ(
+        result.getStatus(),
+        CMEMatchingStatus::REJECTED);
+
+    EXPECT_EQ(
+        orderBook.getSequenceNumber(),
+        0);
+}

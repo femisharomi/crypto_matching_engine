@@ -1,5 +1,8 @@
 #include "gtest/gtest.h"
 
+#include <vector>
+
+#include "cme/market_data/market_data_level.hpp"
 #include "cme/market_data/market_data_snapshot.hpp"
 
 // ============================================================================
@@ -12,16 +15,29 @@
 
 TEST(CMEMarketDataSnapshotTests, StoresCompleteSnapshotInformation)
 {
+    std::vector<CMEMarketDataLevel> bidLevels;
+    bidLevels.push_back(
+        CMEMarketDataLevel(
+            CMEPrice(50000),
+            CMEQuantity(75)));
+
+    std::vector<CMEMarketDataLevel> askLevels;
+    askLevels.push_back(
+        CMEMarketDataLevel(
+            CMEPrice(51000),
+            CMEQuantity(40)));
+
     CMEMarketDataSnapshot snapshot(
         CMESymbol("BTC-GBP"),
         CMEPrice(50000),
         CMEQuantity(75),
         CMEPrice(51000),
         CMEQuantity(40),
-        3,
-        4,
-        {},
-        {});
+        1,
+        1,
+        bidLevels,
+        askLevels,
+        42);
 
     EXPECT_EQ(
         snapshot.getSymbol(),
@@ -30,26 +46,26 @@ TEST(CMEMarketDataSnapshotTests, StoresCompleteSnapshotInformation)
     ASSERT_TRUE(
         snapshot.getBestBid().has_value());
 
-    ASSERT_TRUE(
-        snapshot.getBestBidQuantity().has_value());
-
-    ASSERT_TRUE(
-        snapshot.getBestAsk().has_value());
-
-    ASSERT_TRUE(
-        snapshot.getBestAskQuantity().has_value());
-
     EXPECT_EQ(
         snapshot.getBestBid().value(),
         CMEPrice(50000));
+
+    ASSERT_TRUE(
+        snapshot.getBestBidQuantity().has_value());
 
     EXPECT_EQ(
         snapshot.getBestBidQuantity().value(),
         CMEQuantity(75));
 
+    ASSERT_TRUE(
+        snapshot.getBestAsk().has_value());
+
     EXPECT_EQ(
         snapshot.getBestAsk().value(),
         CMEPrice(51000));
+
+    ASSERT_TRUE(
+        snapshot.getBestAskQuantity().has_value());
 
     EXPECT_EQ(
         snapshot.getBestAskQuantity().value(),
@@ -57,15 +73,51 @@ TEST(CMEMarketDataSnapshotTests, StoresCompleteSnapshotInformation)
 
     EXPECT_EQ(
         snapshot.getBuyLevelCount(),
-        3);
+        1);
 
     EXPECT_EQ(
         snapshot.getSellLevelCount(),
-        4);
+        1);
+
+    ASSERT_EQ(
+        snapshot.getBidLevels().size(),
+        1);
+
+    EXPECT_EQ(
+        snapshot.getBidLevels().at(0).getPrice(),
+        CMEPrice(50000));
+
+    EXPECT_EQ(
+        snapshot.getBidLevels().at(0).getQuantity(),
+        CMEQuantity(75));
+
+    ASSERT_EQ(
+        snapshot.getAskLevels().size(),
+        1);
+
+    EXPECT_EQ(
+        snapshot.getAskLevels().at(0).getPrice(),
+        CMEPrice(51000));
+
+    EXPECT_EQ(
+        snapshot.getAskLevels().at(0).getQuantity(),
+        CMEQuantity(40));
+
+    EXPECT_EQ(
+        snapshot.getSequenceNumber(),
+        42);
 }
 
 TEST(CMEMarketDataSnapshotTests, StoresMissingBestBidAndQuantity)
 {
+    std::vector<CMEMarketDataLevel> bidLevels;
+
+    std::vector<CMEMarketDataLevel> askLevels;
+    askLevels.push_back(
+        CMEMarketDataLevel(
+            CMEPrice(51000),
+            CMEQuantity(40)));
+
     CMEMarketDataSnapshot snapshot(
         CMESymbol("BTC-GBP"),
         std::nullopt,
@@ -73,10 +125,10 @@ TEST(CMEMarketDataSnapshotTests, StoresMissingBestBidAndQuantity)
         CMEPrice(51000),
         CMEQuantity(40),
         0,
-        2,
-        {},
-        {});
-
+        1,
+        bidLevels,
+        askLevels,
+        10);
 
     EXPECT_FALSE(
         snapshot.getBestBid().has_value());
@@ -87,37 +139,64 @@ TEST(CMEMarketDataSnapshotTests, StoresMissingBestBidAndQuantity)
     ASSERT_TRUE(
         snapshot.getBestAsk().has_value());
 
-    ASSERT_TRUE(
-        snapshot.getBestAskQuantity().has_value());
-
     EXPECT_EQ(
         snapshot.getBestAsk().value(),
         CMEPrice(51000));
 
+    ASSERT_TRUE(
+        snapshot.getBestAskQuantity().has_value());
+
     EXPECT_EQ(
         snapshot.getBestAskQuantity().value(),
         CMEQuantity(40));
+
+    EXPECT_TRUE(
+        snapshot.getBidLevels().empty());
+
+    ASSERT_EQ(
+        snapshot.getAskLevels().size(),
+        1);
+
+    EXPECT_EQ(
+        snapshot.getSequenceNumber(),
+        10);
 }
 
 TEST(CMEMarketDataSnapshotTests, StoresMissingBestAskAndQuantity)
 {
+    std::vector<CMEMarketDataLevel> bidLevels;
+    bidLevels.push_back(
+        CMEMarketDataLevel(
+            CMEPrice(50000),
+            CMEQuantity(75)));
+
+    std::vector<CMEMarketDataLevel> askLevels;
+
     CMEMarketDataSnapshot snapshot(
         CMESymbol("BTC-GBP"),
         CMEPrice(50000),
         CMEQuantity(75),
         std::nullopt,
         std::nullopt,
-        2,
+        1,
         0,
-        {},
-        {});
-
+        bidLevels,
+        askLevels,
+        15);
 
     ASSERT_TRUE(
         snapshot.getBestBid().has_value());
 
+    EXPECT_EQ(
+        snapshot.getBestBid().value(),
+        CMEPrice(50000));
+
     ASSERT_TRUE(
         snapshot.getBestBidQuantity().has_value());
+
+    EXPECT_EQ(
+        snapshot.getBestBidQuantity().value(),
+        CMEQuantity(75));
 
     EXPECT_FALSE(
         snapshot.getBestAsk().has_value());
@@ -125,17 +204,23 @@ TEST(CMEMarketDataSnapshotTests, StoresMissingBestAskAndQuantity)
     EXPECT_FALSE(
         snapshot.getBestAskQuantity().has_value());
 
-    EXPECT_EQ(
-        snapshot.getBestBid().value(),
-        CMEPrice(50000));
+    ASSERT_EQ(
+        snapshot.getBidLevels().size(),
+        1);
+
+    EXPECT_TRUE(
+        snapshot.getAskLevels().empty());
 
     EXPECT_EQ(
-        snapshot.getBestBidQuantity().value(),
-        CMEQuantity(75));
+        snapshot.getSequenceNumber(),
+        15);
 }
 
 TEST(CMEMarketDataSnapshotTests, EmptySnapshotContainsNoBestPricesOrQuantities)
 {
+    std::vector<CMEMarketDataLevel> bidLevels;
+    std::vector<CMEMarketDataLevel> askLevels;
+
     CMEMarketDataSnapshot snapshot(
         CMESymbol("BTC-GBP"),
         std::nullopt,
@@ -144,9 +229,13 @@ TEST(CMEMarketDataSnapshotTests, EmptySnapshotContainsNoBestPricesOrQuantities)
         std::nullopt,
         0,
         0,
-        {},
-        {});
+        bidLevels,
+        askLevels,
+        0);
 
+    EXPECT_EQ(
+        snapshot.getSymbol(),
+        CMESymbol("BTC-GBP"));
 
     EXPECT_FALSE(
         snapshot.getBestBid().has_value());
@@ -166,5 +255,15 @@ TEST(CMEMarketDataSnapshotTests, EmptySnapshotContainsNoBestPricesOrQuantities)
 
     EXPECT_EQ(
         snapshot.getSellLevelCount(),
+        0);
+
+    EXPECT_TRUE(
+        snapshot.getBidLevels().empty());
+
+    EXPECT_TRUE(
+        snapshot.getAskLevels().empty());
+
+    EXPECT_EQ(
+        snapshot.getSequenceNumber(),
         0);
 }

@@ -1,9 +1,13 @@
 #include "cme/order_book/order_book.hpp"
 #include <stdexcept>
 
-CMEOrderBook::CMEOrderBook(CMESymbol symbol, CMETradePublisher* publisher) : 
-                           bookSymbol(symbol), tradePublisher(publisher),
-                           nextTradeId(1)
+CMEOrderBook::CMEOrderBook(
+    CMESymbol symbol,
+    CMETradePublisher* publisher)
+    : bookSymbol(symbol),
+      tradePublisher(publisher),
+      nextTradeId(1),
+      sequenceNumber(0)
 {
 
 }
@@ -302,6 +306,11 @@ CMEPrice CMEOrderBook::getBestAsk() const
     return bestAsk->second.getPrice();
 }
 
+std::uint64_t CMEOrderBook::getSequenceNumber() const
+{
+    return sequenceNumber;
+}
+
 void CMEOrderBook::removeEmptyLevel(CMESide side, CMEPrice levelPrice)
 {
     switch (side)
@@ -373,38 +382,53 @@ void CMEOrderBook::createTrade(const CMEOrder &incomingOrder, const CMEOrder &re
     nextTradeId++;
 }
 
+bool CMEOrderBook::removeOrderWithoutSequenceUpdate(CMEOrderId orderId)
+{
+    // Search and remove from buy side.
+    for (std::map<std::int64_t, CMEPriceLevel>::iterator it = buyLevels.begin();
+         it != buyLevels.end();
+         ++it)
+    {
+        if (it->second.removeOrder(orderId))
+        {
+            if (it->second.isEmpty())
+            {
+                buyLevels.erase(it);
+            }
+
+            return true;
+        }
+    }
+
+    // Search and remove from sell side.
+    for (std::map<std::int64_t, CMEPriceLevel>::iterator it = sellLevels.begin();
+         it != sellLevels.end();
+         ++it)
+    {
+        if (it->second.removeOrder(orderId))
+        {
+            if (it->second.isEmpty())
+            {
+                sellLevels.erase(it);
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool CMEOrderBook::cancelOrder(CMEOrderId orderId)
 {
-    // 1. Search and remove from buy side
-    for (std::map<std::int64_t, CMEPriceLevel>::iterator it = buyLevels.begin(); it != buyLevels.end();)
+    if (!removeOrderWithoutSequenceUpdate(orderId))
     {
-        if (it->second.removeOrder(orderId))
-        {
-            if (it->second.isEmpty())
-            {
-                it = buyLevels.erase(it);
-            }
-            return true;
-        }
-        ++it;
+        return false;
     }
 
-    // 2. Search and remove from sell side
-    for (std::map<std::int64_t, CMEPriceLevel>::iterator it = sellLevels.begin(); it != sellLevels.end();)
-    {
-        if (it->second.removeOrder(orderId))
-        {
-            if (it->second.isEmpty())
-            {
-                it = sellLevels.erase(it);
-            }
-            return true;
-        }
-        ++it;
-    }
+    sequenceNumber++;
 
-    // 3. Order not found in any level
-    return false;
+    return true;
 }
 
 std::optional<CMEOrder> CMEOrderBook::findOrder(CMEOrderId orderId) const
@@ -434,7 +458,10 @@ std::optional<CMEOrder> CMEOrderBook::findOrder(CMEOrderId orderId) const
     return std::nullopt;
 }
 
-bool CMEOrderBook::modifyOrder(CMEOrderId orderId, CMEPrice newPrice, CMEQuantity newQuantity)
+bool CMEOrderBook::modifyOrder(
+    CMEOrderId orderId,
+    CMEPrice newPrice,
+    CMEQuantity newQuantity)
 {
     std::optional<CMEOrder> foundOrder = findOrder(orderId);
 
@@ -443,19 +470,23 @@ bool CMEOrderBook::modifyOrder(CMEOrderId orderId, CMEPrice newPrice, CMEQuantit
         return false;
     }
 
-    CMEOrder replacementOrder(foundOrder->getOrderId(),
-                              foundOrder->getOrderSymbol(),
-                              foundOrder->getOrderSide(),
-                              newPrice,
-                              newQuantity);
+    CMEOrder replacementOrder(
+        foundOrder->getOrderId(),
+        foundOrder->getOrderSymbol(),
+        foundOrder->getOrderSide(),
+        newPrice,
+        newQuantity);
 
-    if (orderValidator.validateOrder(replacementOrder) != CMEOrderValidationResult::VALID)
+    if (orderValidator.validateOrder(replacementOrder) !=
+        CMEOrderValidationResult::VALID)
     {
         return false;
     }
 
-    if (!cancelOrder(orderId))
+    if (!removeOrderWithoutSequenceUpdate(orderId))
+    {
         return false;
+    }
 
     return addOrder(replacementOrder);
 }
@@ -612,6 +643,8 @@ CMEMatchingResult CMEOrderBook::processOrder(CMEOrder incomingOrder)
             rejection);
     }
 
+    sequenceNumber++;
+
     // The order traded but still has remaining quantity resting.
     if (tradeGenerated)
     {
@@ -719,5 +752,6 @@ CMEMarketDataSnapshot CMEOrderBook::getMarketDataSnapshot() const
         buyLevels.size(),
         sellLevels.size(),
         snapshotBidLevels,
-        snapshotAskLevels);
+        snapshotAskLevels,
+        sequenceNumber);
 }
