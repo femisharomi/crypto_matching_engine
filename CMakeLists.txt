@@ -36,6 +36,7 @@ add_library(cme_core
     software/src/time/test_clock.cpp
     software/src/input/order_input_parser.cpp
     software/src/input/file_order_reader.cpp
+    software/src/input/simulated_order_feed.cpp
 )
 
 # Specifies where the header (.h/.hpp) files for 'cme_core' are located.
@@ -107,6 +108,7 @@ add_executable(cme_tests
     software/tests/fixtures/test_order_builder.cpp
     software/tests/input/test_order_input_parser.cpp
     software/tests/input/test_file_order_reader.cpp
+    software/tests/input/test_simulated_order_feed.cpp
 )
 
 # Links the test runner to your core engine and the downloaded GoogleTest framework.
