@@ -2,7 +2,8 @@
 #include "cme/trade/trade_publisher.hpp"
 
 
-CMEMatchingEngine::CMEMatchingEngine(CMETradePublisher* publisher) : tradePublisher(publisher)
+CMEMatchingEngine::CMEMatchingEngine(CMETradePublisher* publisher, CMEClock* engineclock) : 
+                                    tradePublisher(publisher), clock(engineclock)
 {
     
 }
@@ -154,7 +155,8 @@ CMEMatchingResult CMEMatchingEngine::processOrder(CMEOrder incomingOrder)
         orderBooks.try_emplace(
             incomingOrder.getOrderSymbol().value,
             incomingOrder.getOrderSymbol(),
-            tradePublisher);
+            tradePublisher,
+            clock);
     }
 
     // Retrieve the correct order book.

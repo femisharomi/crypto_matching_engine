@@ -10,13 +10,14 @@
 #include "cme/engine/engine_command.hpp"
 #include "cme/engine/engine_event.hpp"
 #include "cme/trade/trade_publisher.hpp"
+#include "cme/time/clock.hpp"
 
 /* Stores and manages multiple order books. */
 class CMEMatchingEngine
 {
 public:
-    /* Creates an empty matching engine using the supplied trade publisher when one is provided. */
-    CMEMatchingEngine(CMETradePublisher* publisher = nullptr);
+    /* Creates a matching engine with optional trade publishing and clock dependencies. */
+    CMEMatchingEngine(CMETradePublisher* publisher = nullptr, CMEClock* engineClock = nullptr);
 
     /* Processes an order using the correct order book. */
     CMEMatchingResult processOrder(CMEOrder incomingOrder); 
@@ -45,6 +46,9 @@ private:
 
     // The trade publisher supplied to order books created by this engine.
     CMETradePublisher* tradePublisher;
+
+    // The non-owning clock passed to order books created by the engine.
+    CMEClock* clock;
 };
 
 #endif // CME_ENGINE_MATCHING_ENGINE_HPP

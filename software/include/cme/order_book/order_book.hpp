@@ -13,13 +13,14 @@
 #include "cme/matching/matching_result.hpp"
 #include "cme/trade/trade_publisher.hpp"
 #include "cme/market_data/market_data_snapshot.hpp"
+#include "cme/time/clock.hpp"
 
 /* Stores the buy and sell price levels for one trading symbol. */
 class CMEOrderBook
 {
 public:
     /* Creates an empty order book for one trading symbol. */
-    explicit CMEOrderBook(CMESymbol symbol, CMETradePublisher* publisher = nullptr);
+    explicit CMEOrderBook(CMESymbol symbol, CMETradePublisher* publisher = nullptr, CMEClock* bookclock = nullptr);
 
     /* Returns the trading symbol represented by this order book. */
     CMESymbol getSymbol() const;
@@ -90,6 +91,13 @@ private:
 
     // The sequence number of the latest successful order book change.
     std::uint64_t sequenceNumber;
+
+    // The non-owning clock used to timestamp generated market data.
+    CMEClock* clock;
+
+    /////////////////////////////////////
+    // Functions
+    /////////////////////////////////////
 
     /* Returns whether any buy price levels exist. */
     bool hasBuyLevels() const;

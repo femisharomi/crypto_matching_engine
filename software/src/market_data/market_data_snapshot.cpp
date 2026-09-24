@@ -3,11 +3,12 @@
 CMEMarketDataSnapshot::CMEMarketDataSnapshot(CMESymbol snapshotSymbol, std::optional<CMEPrice> snapshotBestBid, std::optional<CMEQuantity> snapshotBestBidQuantity,
                     std::optional<CMEPrice> snapshotBestAsk, std::optional<CMEQuantity> snapshotBestAskQuantity, std::size_t snapshotBuyLevelCount,
                     std::size_t snapshotSellLevelCount, std::vector<CMEMarketDataLevel> snapshotBidLevels, 
-                        std::vector<CMEMarketDataLevel> snapshotAskLevels, std::uint64_t snapshotSequenceNumber) : 
+                    std::vector<CMEMarketDataLevel> snapshotAskLevels, std::uint64_t snapshotSequenceNumber,
+                    std::uint64_t snapshotTimestamp) : 
                     symbol(snapshotSymbol), bestBid(snapshotBestBid), bestBidQuantity(snapshotBestBidQuantity),
                     bestAsk(snapshotBestAsk), bestAskQuantity(snapshotBestAskQuantity),buyLevelCount(snapshotBuyLevelCount), 
                     sellLevelCount(snapshotSellLevelCount), bidLevels(snapshotBidLevels), askLevels(snapshotAskLevels),
-                    sequenceNumber(snapshotSequenceNumber)
+                    sequenceNumber(snapshotSequenceNumber), timestamp(snapshotTimestamp)
 {
     
 }
@@ -61,3 +62,8 @@ std::uint64_t CMEMarketDataSnapshot::getSequenceNumber() const
 {
     return sequenceNumber;
 }
+
+ std::uint64_t CMEMarketDataSnapshot::getTimestamp() const
+ {
+    return timestamp;
+ }
